@@ -26,8 +26,8 @@ year_use = ds_use.YEAR(idx_use2);
 if flag
     X_city = [ds_use.RET(idx_use) ...
         ds_use.RP(idx_use) ds_use.PI_ratio(idx_use) ...
-        ... %ds_use.risk_idx(idx_use) ./ ds_use.risk_idx2(idx_use) ...
-        ds_use.risk_idx(idx_use) ds_use.risk_idx2(idx_use) ... 
+        ds_use.risk_idx(idx_use) ./ ds_use.risk_idx2(idx_use) ...
+        ds_use.risk_idx(idx_use) ...%ds_use.risk_idx2(idx_use) ... 
         ds_use.APR(idx_use) ds_use.POPCHG(idx_use) ds_use.PCICHG(idx_use) ...
         ds_use.NU2POP(idx_use) ds_use.EMPCHG(idx_use) ...
         ds_use.LFCHG(idx_use) ds_use.URATE(idx_use) ...
@@ -85,29 +85,28 @@ for t_use = t_begin : t_end
     for i=1:N_pred  % generate the simple predictors 
         pred = unique([1 i]);
         
-        [beta_sic, lags1_opt, lags2_opt] = gen_beta_sic(y_city(1:t_est),X_city(1:t_est,pred));
-        if ( size(pred,2) == 2 )
-           
-            X_lag_mat = [ lagmatrix(X_city(1:t_use,1),(0:lags1_opt)) lagmatrix(X_city(1:t_use,i),(0:lags2_opt)) ];
-           
-        else
-            X_lag_mat = lagmatrix(X_city(1:t_use,1),(0:lags1_opt));  
+        if false % this version uses SIC to select variable lags
+            [beta_sic, lags1_opt, lags2_opt] = gen_beta_sic(y_city(1:t_est),X_city(1:t_est,pred));
+            if ( size(pred,2) == 2 )
+                X_lag_mat = [ lagmatrix(X_city(1:t_use,1),(0:lags1_opt)) lagmatrix(X_city(1:t_use,i),(0:lags2_opt)) ];
+            else
+                X_lag_mat = lagmatrix(X_city(1:t_use,1),(0:lags1_opt));
+            end
+            X_use2 = X_lag_mat(t_use,:);
+            y_1f(t_use,i) = [1.0 X_use2] * beta_sic;
+            
+            %if true %or(lags1_opt >0, lags2_opt>0)
+            %if ( mod(t_use,10) == 0 )
+            %    disp([i lags1_opt, lags2_opt]);
+            %end
+        else    % this version uses fixed lags
+            stats_i = regstats(y_city(1:t_est),X_city(1:t_est,pred),'linear');
+            y_1f(t_use,i) = [1.0 X_city(t_use,pred)] * stats_i.beta;
         end
-        
-        %if true %or(lags1_opt >0, lags2_opt>0)
-        %if ( mod(t_use,10) == 0 )
-        %    disp([i lags1_opt, lags2_opt]);
-        %end
-        X_use2 = X_lag_mat(t_use,:);
-        
-        %stats_i = regstats(y_city(1:t_est),X_city(1:t_est,pred),'linear');
-        %y_1f(t_use,i) = [1.0 X_city(t_use,pred)] * stats_i.beta;
-        y_1f(t_use,i) = [1.0 X_use2] * beta_sic;
-        
+        %% impose min / max returns
         y_1f(t_use,i) = max( y_1f(t_use,i), -1.0 );
         y_1f(t_use,i) = min( y_1f(t_use,i), 1.0 );
-        %y_1f(t_use,i) = [1.0 X_city(t_est,pred)] * stats_i.beta;
-        %y_1f(t_use,i) = [1.0 X_city(t_use,pred)] * stats_i.beta; 
+        
     end  
     %%
     y_1f(t_use, N_pred + 1) = mean(X_city(1:t_use, 1 ) );        %naive: historical mean

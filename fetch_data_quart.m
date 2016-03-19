@@ -72,6 +72,7 @@ end
 
 
 %%
+
 close(c);
 
 SMSA_unique = unique(newhouse_flat.SMSA);
@@ -88,6 +89,7 @@ SMSA_vec2 = sortrows(SMSA_vec, -2);
 
 
 %%
+%{
 pop_wvec = [ .19 .13 .09 .06 .06 .06 .05 .05 .04 .04 .04 .03 .03 .03 .03 .03 .02];
 ds_pool.risk_idx2 = zeros(length(ds_pool),1);
 
@@ -98,6 +100,7 @@ for i = 1:length(ds_pool)
     
     ds_pool.risk_idx2(i) =  pop_wvec * ds_use_natl.risk_idx;
 end
+%}
 
 %save('notes_fetch_results.mat');
 save('fetch_data_save.mat');

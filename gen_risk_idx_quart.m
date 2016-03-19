@@ -24,15 +24,19 @@ param.Y_CC = 50000;
 %%
 for id = 1:length(ds_use)
     param.CURR_YEAR = ds_use.YEAR(id); %2013;
-    [ds_id, val] = find(param.CURR_YEAR == newhouse_flat_years, 1, 'first');
+    %[ds_id, val] = find(param.CURR_YEAR == newhouse_flat_years, 1, 'first');
+    [ds_id, val] = find(newhouse_flat_years <= param.CURR_YEAR, 1, 'last');
+    param.CURR_YEAR = newhouse_flat_years(ds_id);
     
-    if ( ~isempty(ds_id) && ( ds_use.QUARTER(id) == 1 ) ) 
+    if ( ~isempty(ds_id) )
+    %if ( ~isempty(ds_id) && ( ds_use.QUARTER(id) == 1 ) ) 
         % find risk index for current city
         param.APR = ds_use.APR(id);  %.04;
         param.P_HR = 1.0*ds_use.RENT(id);
         param.med_val = ds_use.PRICE(id); %500000;
         
         [a1_ds, a2_ds] = clean_newhouse( param, newhouse_flat );
+        %[a1_ds, a2_ds] = clean_newhouse( param, newhouse_flat );
         %PMT = 12.0*a2_ds.PMT;
         
         fprintf('City: %s, renters: %d, owners: %d \n', char(city_str), length(a1_ds), length(a2_ds) );

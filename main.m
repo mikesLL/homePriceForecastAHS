@@ -1,5 +1,5 @@
 % For this program, want to load up results and CITY BY CITY, estimate and
-% test forecast combination model as in rapach and strauss (2007)
+% test forecast combination model as in Rapach and Strauss (2007)
 
 clear all
 
@@ -9,6 +9,10 @@ else
     load fetch_data_save;
 end
 
+%%
+idx = (ds_pool.city_id == 1);
+risk_idx = ds_pool.risk_idx(idx) ./ ds_pool.risk_idx2(idx);
+plot(risk_idx);
 %%
 ds_use = ds_pool;
 %ds_use.risk_idx = ds_use.risk_idx2;
@@ -112,7 +116,7 @@ for city_id = 1:N_cities
 
    table44_mvgamma{mv_gamma} = table44;
    %%
-   if true
+   if false
        figure; hold on;
        plot(date_axis(49:96),port_ret0(49:96));
        plot(date_axis(49:96),port_ret1(49:96),'r');
@@ -172,7 +176,7 @@ for city_id = 1:N_cities
 end
 
 %%
-ds_pool.risk_idx2 = zeros(length(ds_pool),1);
+%ds_pool.risk_idx2 = zeros(length(ds_pool),1);
 
 %table4 = gen_tabe4;
 
