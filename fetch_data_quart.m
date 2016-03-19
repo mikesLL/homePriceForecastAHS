@@ -87,43 +87,4 @@ end
 SMSA_vec = [SMSA_unique SMSA_count];
 SMSA_vec2 = sortrows(SMSA_vec, -2);
 
-
-%%
-%{
-pop_wvec = [ .19 .13 .09 .06 .06 .06 .05 .05 .04 .04 .04 .03 .03 .03 .03 .03 .02];
-ds_pool.risk_idx2 = zeros(length(ds_pool),1);
-
-for i = 1:length(ds_pool)
-    idx_use1 = and( ds_pool.YEAR == ...
-        ds_pool.YEAR(i), ds_pool.QUARTER == ds_pool.QUARTER(i) );
-    ds_use_natl = ds_pool(idx_use1,:);
-    
-    ds_pool.risk_idx2(i) =  pop_wvec * ds_use_natl.risk_idx;
-end
-%}
-
-%save('notes_fetch_results.mat');
 save('fetch_data_save.mat');
-
-%%
-
-%middate = '04/01/1986';
-
-%dateseries = ones(4*28 + 1,1) .*  '01/01/1986';
-%dateseries = repmat('01/01/1986', 4*28+1, 1);
-%date_add =  repmat( [0 3 0 0 0 0 0 0 0 0], 4*28 + 1, 1 );
-
-%date_add(:,2) = date_add(:,2) .* (0:(4*28) )';
-
-%dateseries(2,:) = dateseries(2,:) + date_add(2,:);
-%dateseries(3,:) = dateseries(3,:) + date_add(3,:);
-%dateseries = dateseries + date_add;
-
-%dateseries2(1:3,:) = dateseries(1:3,:) + date_add(1:3,:);
-
-
-%dateseries3 = repmat('01/01/1986', 4*28+1, 1);
-%for i=1:length(dateseries3)
-%   dateseries3(i,:) = dateseries3(i,:) + i*[0 3 0 0 0 0 0 0 0 0];
-%end
-
