@@ -61,6 +61,7 @@ date_axis = ds_use.YEAR(idx1) + .25*(ds_use.QUARTER(idx1) - 1);
 %%
 gamma_idx = [0, 2, 4, 6, 8, 10];
 for g_i = 1:length(gamma_idx)
+    %%
     mv_gamma = gamma_idx(g_i);
 for city_id = 1:N_cities
     %%
@@ -115,7 +116,7 @@ for city_id = 1:N_cities
 
    table44_mvgamma{g_i} = table44;
    %%
-   if true
+   if false
        % plot returns with ability to take housing positions
        figure; hold on;
        plot(date_axis(49:96),port_ret_store0{g_i}{city_id}(49:96));

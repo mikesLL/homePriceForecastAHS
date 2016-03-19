@@ -191,9 +191,10 @@ for t_use = t_begin : t_end
          OMEGA(1:2,1:2) = OMEGA_tmp;
          
          mu_x = .065; % + X_spy_yield(t_use);
+         t_cost = .00; 
          %mu_h = .95*y_1f_combo(t_use,i_combo_use) + .9*X_rp(t_use);
          %mu_h = .8*y_1f_combo(t_use,i_combo_use) + .8*X_rp(t_use);
-         mu_h = y_1f_combo(t_use,i_combo_use) + X_rp(t_use) - .15;
+         mu_h = y_1f_combo(t_use,i_combo_use) + X_rp(t_use) - t_cost;
         
          if ( mu_h_flag == 0 )
              mu_h = 0;
