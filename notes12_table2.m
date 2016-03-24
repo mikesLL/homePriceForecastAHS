@@ -1,3 +1,9 @@
+%{
+notes12_table2.m
+
+input: city, dataset, flag, gamma
+output: forecast, forecast combo, RMSE, portfolio weights
+%}
 % heart of the project
 % main input should be a particular city
 %main output should be AR RMSE, and RMSE of each predictor and combination

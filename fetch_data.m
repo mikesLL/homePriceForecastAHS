@@ -1,9 +1,11 @@
-%clear all;
+
+%{
 load dsreadin_codes;
 load smsa_table;
 load newhouse_flat;
+load dsreadin_macro_data;
 
-param.CFUSE = 'DCFP';  % = 'CFP';
+param.CFUSE =  'DCFP'; %'CFP'; %'DCFP';  % = 'CFP';
 param.LTI = .35;        % may want to load up an estimate of this; time-varying LTI?
 param.max_mult = 40;
 param.min_mult = 10;
@@ -12,12 +14,11 @@ param.Y_CC = 50000;
 c = fred('https://research.stlouisfed.org/fred2/');           
 fromdate = '01/01/1986';   % beginning of date range for historical data
 todate = '01/01/2014';     % ending of date range for historical data
-
+%}
 N_cities = max(dsreadin_codes.city_id);
 ds_in{N_cities} = dataset;
 
 %%
-city_id = 2;
 for city_id = 1:N_cities  %11:14    % = 1: N_cities
     
     fprintf('load city_id %d \n', city_id);
@@ -27,13 +28,21 @@ for city_id = 1:N_cities  %11:14    % = 1: N_cities
     param.seriesStr = dsreadin_codes.city_str{city_id};
     series_codes = dsreadin_codes(city_id,:);
     
-    ds_in{city_id} = fetch_fred(c, param, fromdate, todate, series_codes );   
-    tmp = ds_in{city_id};
+    %ds_in{city_id} = fetch_fred(c, param, fromdate, todate, series_codes ); 
+    %ds_in{city_id} = fetch_fred_quart(c, param, fromdate, todate, series_codes );
+    ds_in0 = fetch_fred_quart(c, param, fromdate, todate, series_codes );
+    ds_in0.spy_ret_fut = dsreadin_macro_data.spy_ret_fut;
+    ds_in0.spy_ret = dsreadin_macro_data.spy_ret;
+    ds_in0.spy_yield = dsreadin_macro_data.spy_yield;
+    ds_in{city_id} = ds_in0;
+    
+    %tmp = ds_in{city_id};
 end
 
 %% ds_pool now contains pooled data for all cities
 ds_pool = vertcat(ds_in{:});
 ds_pool.risk_idx = zeros(length(ds_pool),1);
+ds_pool.risk_idx2 = zeros(length(ds_pool),1);
 save('notes_fetch_mid');
 
 % issue for riverside: no renters or owners found in any year; 
@@ -56,12 +65,15 @@ for city_id = 1:N_cities
     %i_end = 27;
     i_beg = find( ds_pool.city_id == city_id, 1, 'first');
     i_end = find( ds_pool.city_id == city_id, 1, 'last');
-    test_vec = gen_risk_idx(param, city_str, ds_pool(i_beg: i_end,:), newhouse_flat);
+    %test_vec = gen_risk_idx(param, city_str, ds_pool(i_beg: i_end,:), newhouse_flat);
+    [test_vec, test_vec2] = gen_risk_idx_quart(param, city_str, ds_pool(i_beg: i_end,:), newhouse_flat);
     ds_pool.risk_idx(i_beg:i_end) = test_vec;
+    ds_pool.risk_idx2(i_beg:i_end) = test_vec2;
 end
 
 
 %%
+
 close(c);
 
 SMSA_unique = unique(newhouse_flat.SMSA);
@@ -76,5 +88,4 @@ end
 SMSA_vec = [SMSA_unique SMSA_count];
 SMSA_vec2 = sortrows(SMSA_vec, -2);
 
-%save('notes_fetch_results.mat');
 save('fetch_data_save.mat');
