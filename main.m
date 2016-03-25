@@ -18,12 +18,9 @@ c = fred('https://research.stlouisfed.org/fred2/');     % connection to FRED Dat
 fromdate = '01/01/1986';   % beginning of date range for historical data
 todate = '01/01/2014';     % ending of date range for historical data
 
-if true
-    %% fetch data
-    ds_use = fetch_data_fn( param, dsreadin_codes, dsreadin_macro_data, fromdate, todate, c);
-else
-    load fetch_data_save;
-end
+%% fetch or load data
+ds_use = fetch_data_fn( param, dsreadin_codes, dsreadin_macro_data, fromdate, todate, c);
+%load fetch_data_save;
 
 %% generate the risk indices
 ds_use.risk_idx = zeros(length(ds_use),1);
@@ -45,13 +42,10 @@ table3 = table2;
 table2_mf = table2;
 table3_mf = table2;
 
-% table4: mu, std for portfolio with and without micro vars
-table4 = dataset( zeros(N_cities,1) );
+table4 = dataset( zeros(N_cities,1) );   %mu, std for portfolio with and without micro vars
 table4 = repmat(table4, 1, 5);
 table4.Properties.VarNames = {'mu0', 'std0', 'mu1', 'std1', 'cer' };
-
-% table5_mvgamma: stores entire table for each gamma value
-table4_mvgamma{20} = table4;
+table4_mvgamma{20} = table4;             %stores entire table for each gamma value
 
 %%
 city_id = 2;
@@ -106,33 +100,3 @@ end
 
 save('main_save');
 
-%%
-%{
-port_ret_store0{17} = zeros(100,1);
-port_ret_store1{17} = zeros(100,1);
-port_ret_store2{17} = zeros(100,1);
-
-X_opt_store0{17} = zeros(100,4);
-X_opt_store1{17} = zeros(100,4);
-X_opt_store2{17} = zeros(100,4);
-%}
-
-%{
-table44 = dataset;
-table44.mu0 = zeros(N_cities,1);
-table44.std0 = zeros(N_cities,1);
-table44.mu1 = zeros(N_cities,1);
-table44.std1 = zeros(N_cities,1);
-table44.cer = zeros(N_cities,1);
-table44_mvgamma{20} = table44.cer;
-%}
-
-%{
-% want to be able to get rid of thse soon
-N_pred = 14;            % number of predictor variables w/ microdata
-N_pred0 = N_pred - 2;   % number of predictor variables w/o microdata
-N_naive = 2;            % number naive forecasts
-N_combo = 5;            % number combination forecasts
-N_tot = N_pred + N_naive + N_combo; % number all forecasts w/microdata
-N_tot0 = N_tot - 2;
-%}

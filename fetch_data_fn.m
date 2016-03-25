@@ -23,5 +23,7 @@ end
 ds_pool = vertcat(ds_in{:});   % ds_pool now contains pooled data for all cities
 
 close(c);
+
+save('fetch_data_save.mat');
 end
 
