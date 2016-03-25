@@ -7,11 +7,13 @@ evaluates performance
 %}
 clear all
 
+addpath('readin');
 load dsreadin_codes;
 load smsa_table;
 load newhouse_flat;
 load dsreadin_macro_data;
 
+%%
 param = gen_param;
 
 c = fred('https://research.stlouisfed.org/fred2/');     % connection to FRED Data

@@ -66,6 +66,37 @@ for id = 1:length(ds_use)
         risk_idx2(id) = -9;    % invalid / not-found marker
     end
 end
+
+%%
+val = 0.0;
+for i=1:length(risk_idx)
+    if risk_idx(i) <= -8
+        risk_idx(i) = val;
+    else
+        val = risk_idx(i);
+    end
+    
+end
+
+%%
+val = 0.0;
+for i=1:length(risk_idx2)
+    if risk_idx2(i) <= -8
+        risk_idx2(i) = val;
+    else
+        val = risk_idx2(i);
+    end
+    
+end
+
+%%
+risk_idx = max(risk_idx, 0.01);
+risk_idx2 = max(risk_idx2, 0.01);
+
+end
+
+
+
 %{
 %% second pass for interpolation
 for id = 1:length(ds_use)
@@ -101,33 +132,6 @@ for id = 1:length(ds_use)
     end
 end
 %}
-%%
-val = 0.0;
-for i=1:length(risk_idx)
-    if risk_idx(i) <= -8
-        risk_idx(i) = val;
-    else
-        val = risk_idx(i);
-    end
-    
-end
-
-%%
-val = 0.0;
-for i=1:length(risk_idx2)
-    if risk_idx2(i) <= -8
-        risk_idx2(i) = val;
-    else
-        val = risk_idx2(i);
-    end
-    
-end
-
-%%
-risk_idx = max(risk_idx, 0.01);
-risk_idx2 = max(risk_idx2, 0.01);
-
-end
 
 
 %risk_idx_tmp = risk_idx;
