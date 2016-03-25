@@ -49,7 +49,7 @@ table4_mvgamma{20} = table4;             %stores entire table for each gamma val
 
 %%
 city_id = 2;
-gen_plot(param, ds_use, city_id, 'LAX');
+%gen_plot(param, ds_use, city_id, 'LAX');
 
 util_diff = zeros(N_cities,1);
 util0_store = zeros(N_cities,1);

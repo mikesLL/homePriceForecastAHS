@@ -1,7 +1,5 @@
 function [ ds ] = fetch_fred_quart(c, param, fromdate, todate, series_codes )
 
-save('fetch_fred_save');
-
 %%
 rent2014 = param.rent2014;
 price2014 = param.price2014;
@@ -67,7 +65,7 @@ ds.YEAR =  year(dateseries_quart);
 ds.MONTH = month(dateseries_quart);
 ds.QUARTER = floor( month(dateseries_quart) ./ 3.0 ) + 1;
 
-% generate the return dataset
+%generate the return dataset
 %ds = dataset;
 %ds.city_id = param.city_id*ones(size(year_vec));
 %ds.YEAR = year_vec;
@@ -90,30 +88,4 @@ ds.LFCHG = lf_perc_chg;
 ds.URATE = urate;
 
 end
-
-%%
-
-%ret_tmp = ( data_tmp(2:end) - data_tmp(1:end-1) ) ./ data_tmp(1:end-1);
-%ret_fut = ret_tmp;
-%ret = [ 0; ret_tmp(1:end-1) ];
-%ret = ret_tmp;
-%ret_fut = [ret_tmp(2:end); 0];
-
-
-% Q: think about how to keep the number of units
-% The good thing is fetch retrives the units and length
-% An interesting thing to try would be to save the units and to modify the
-% series based on length
-
-%ds = dataset;
-%ds.ret = zeros(27,1);
-%ds.ret_fut = zeros(27,1);
-
-
-% sweet; now have the main things you need; fut returns, returns, and rp
-% ratio
-
-% now check out home price to income ratio?
-
-% load in per capita income
 
