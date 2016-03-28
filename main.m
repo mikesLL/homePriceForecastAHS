@@ -1,28 +1,20 @@
 %{
 main.m
-loads data using fetch_data quart and then for each city computes h-step
+this script loads housing-related data using fetch_data_fn and then for each city computes h-step
 forecast and for each forecast computes OOS RMSE
 Then incorporates forecast into an mean-variance optimization problem and
 evaluates performance
+
+Copyright A. Michael Sharifi 2016
+
+Dependencies:
+fetch_data.m: script which loads housing data from FRED;
+results are stored as fetch_data_save.m
 %}
-clear all
 
-addpath('readin');
-load dsreadin_codes;
-load smsa_table;
-load newhouse_flat;
-load dsreadin_macro_data;
-
-%%
-param = gen_param;
-
-c = fred('https://research.stlouisfed.org/fred2/');     % connection to FRED Data
-fromdate = '01/01/1986';   % beginning of date range for historical data
-todate = '01/01/2014';     % ending of date range for historical data
-
-%% fetch or load data
-ds_use = fetch_data_fn( param, dsreadin_codes, dsreadin_macro_data, fromdate, todate, c);
-%load fetch_data_save;
+clear all;
+param = gen_param; % load parameters
+load fetch_data_save; % load housing data from fetch_data.m
 
 %% generate the risk indices
 ds_use.risk_idx = zeros(length(ds_use),1);
@@ -47,7 +39,6 @@ table3_mf = table2;
 table4 = dataset( zeros(N_cities,1) );   %mu, std for portfolio with and without micro vars
 table4 = repmat(table4, 1, 5);
 table4.Properties.VarNames = {'mu0', 'std0', 'mu1', 'std1', 'cer' };
-table4_mvgamma{20} = table4;             %stores entire table for each gamma value
 
 %%
 city_id = 2;
@@ -97,7 +88,6 @@ for city_id = 1:N_cities
     util0_store( city_id ) = util0;
     util1_store( city_id ) = util1;
     util_diff( city_id ) = util1 - util0;
-
 end
 
 save('main_save');

@@ -1,5 +1,5 @@
 %{
-gen_weights.m
+gen_port.m
 
 use home price forecast to generate portfolio weights
 evaluate portfolio
@@ -9,6 +9,8 @@ output: forecast, forecast combo, RMSE, portfolio weights
 
 port_ds should include:
 sharpe_ratio, util, port_ret, x_opt_store
+
+Copyright A. Michael Sharifi 2016
 %}
 
 function [ port_ds ] = gen_port(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma )
@@ -76,36 +78,9 @@ for t_use = (t_begin + h_step + 1) : t_end
     port_ds.sharpe_ratio(t_use) = port_ds.mean_est(t_use) / port_ds.std_est(t_use);
     port_ds.util(t_use) = port_ds.mean_est(t_use) - mv_gamma / 2.0 * port_ds.std_est(t_use).^2;
 
-    %port_ds.sharpe_ratio(t_use) = mean( port_ds.port_ret(idx_use2) ) /  std( port_ds.port_ret(idx_use2) ) ;
     port_ds.util(t_use) = mean( port_ds.port_ret(idx_use2) ) - mv_gamma / 2.0 * var( port_ds.port_ret(idx_use2) ) ;
 end
 
 end
-
-
-
-%%
-%x_opt = gen_MVw( MU, OMEGA, mv_gamma );
-%x_opt_store(t_use,:) = x_opt;
-%disp(x_opt);
-%port_ds.x_opt(t_use,:) = x_opt;
-
-%ret_exante = [X_spy_ret_fut(t_use) + X_spy_yield(t_use), y_city(t_use) + X_rp(t_use) - .15, .7*X_apr(t_use), .5*X_apr(t_use)    ];
-%mu_h = .95*y_1f_combo(t_use,i_combo_use) + .9*X_rp(t_use);
-%sharpe_ratio = mean( port_ret(45:t_end) ) / ( std( port_ret(45:t_end) )  );
-%util = mean( port_ret(45:t_end) ) - mv_gamma / 2 *  var( port_ret(45:t_end) ) ;
-
-%y_1f_combo_var(t_use, 1) = ...
-%    var( y_ds.RET_fut(t_begin + h_step:t_use) - y_ds.fore_combo(t_begin + h_step:t_use,i_combo_use) - .5*X_apr(t_begin + h_step:t_use ) );
-
-%{
-    imagine something like this:
-    MU as above (ex-ante returns)
-    ret_MU = MU;
-    ret_realized = [.01 .04 .05 .02 ];
-    port_ret(t_use) = x_opt * ret_realized;
-    so it looks like i need: stock returns and future stock
-    returns; might as well get dividend yield
-%}
 
 
