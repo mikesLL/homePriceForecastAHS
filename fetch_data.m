@@ -37,9 +37,14 @@ for city_id = 1:N_cities  %11:14    % = 1: N_cities
    
 end
 
-ds_pool = vertcat(ds_in{:});   % ds_pool now contains pooled data for all cities
+ds_use = vertcat(ds_in{:});   % ds_pool now contains pooled data for all cities
 
 close(c);
+
+%% generate the risk indices
+ds_use.risk_idx = zeros(length(ds_use),1);
+ds_use.risk_idx2 = zeros(length(ds_use),1);
+ds_use = gen_risk_idx_fn( param, dsreadin_codes, ds_use, newhouse_flat );
 
 save('fetch_data_save.mat');
 

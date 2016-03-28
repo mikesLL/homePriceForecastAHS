@@ -16,11 +16,6 @@ clear all;
 param = gen_param; % load parameters
 load fetch_data_save; % load housing data from fetch_data.m
 
-%% generate the risk indices
-ds_use.risk_idx = zeros(length(ds_use),1);
-ds_use.risk_idx2 = zeros(length(ds_use),1);
-ds_use = gen_risk_idx_fn( param, dsreadin_codes, ds_use, newhouse_flat );
-
 %%
 N_cities = max(ds_use.city_id);
 N_stats = 40;                       % max number of stats computed

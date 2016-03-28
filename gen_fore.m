@@ -21,16 +21,17 @@ output: forecast, forecast combo, RMSE, portfolio weights
 
 function [ y_ds, y_res ] = gen_fore( city_id, ds_use, micro_flag )
 
-save('gen_fore.mat');
-% save('notes12_table2_save.mat');
+save('gen_fore_save.mat');
+
 %% micro_flag = flag;
 idx_use = all([ ds_use.YEAR >= 1988, ds_use.YEAR <= 2012, ds_use.city_id == city_id  ], 2);
 
 X_city_fund =  [ ds_use.RET(idx_use) ds_use.RP(idx_use) ds_use.PI_ratio(idx_use)];
 
-X_city_micro =  [ ds_use.risk_idx(idx_use) ./ ds_use.risk_idx2(idx_use) ...
-    ds_use.risk_idx(idx_use)  ]; %...%ds_use.risk_idx2(idx_use) ...
-
+X_city_micro =  [ ds_use.risk_idx(idx_use) ...                                 % proportion at-risk households
+                  ds_use.risk_idx2(idx_use) ...                                % proportion potential buyers
+                  ds_use.risk_idx(idx_use) ./ ds_use.risk_idx2(idx_use) ];     % ratio at-risk households to potential buyers
+                 
 X_city_other = [ ds_use.APR(idx_use) ds_use.POPCHG(idx_use) ds_use.PCICHG(idx_use) ...
     ds_use.NU2POP(idx_use) ds_use.EMPCHG(idx_use) ...
     ds_use.LFCHG(idx_use) ds_use.URATE(idx_use) ...
@@ -75,10 +76,7 @@ for t_use = t_begin:t_end
     
     for i=1:N_pred  % generate the simple predictors
         pred = unique([1 i]);
-        a = y_city(1:t_est);
-        b = X_city(1:t_est, pred);
-        stats_i = regstats(y_city(1:t_est),X_city(1:t_est,pred),'linear');
-        
+        stats_i = regstats(y_city(1:t_est),X_city(1:t_est,pred),'linear');  
         y_ds.fore(t_use,i) = [1.0 X_city(t_use,pred)] * stats_i.beta;
     end
     
