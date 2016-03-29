@@ -13,8 +13,8 @@ results are stored as fetch_data_save.m
 %}
 
 clear all;
-param = gen_param; % load parameters
 load fetch_data_save; % load housing data from fetch_data.m
+param = gen_param; % load parameters
 
 %%
 N_cities = max(ds_use.city_id);
@@ -45,7 +45,6 @@ util1_store = zeros(N_cities,1);
 mv_gamma = 4;
 
 %%
-save('main_mid1_save');
 y_ds_store{N_cities} = dataset;
 y_ds_mf_store{N_cities} = dataset;
 
