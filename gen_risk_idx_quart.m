@@ -34,7 +34,8 @@ for id = 1:length(ds_use)
         N_nat_buyers = sum( .35/param.APR*a1_ds.ZINC2 >= param.med_val  );
         %N_nat_buyers = sum( .25/param.APR*a1_ds.ZINC2 >= param.med_val  );
         
-        [ WCF, N_dcfp, N_cfp ] = gen_WCF_lite(param, a2_ds );
+        %[ WCF, N_dcfp, N_cfp ] = gen_WCF_lite(param, a2_ds );
+        [ WCF, N_dcfp, N_cfp ] = gen_NEGEQ(param, a2_ds );
         
         N_at_risk_sellers1 = length(a2_ds) - N_cfp;
         N_at_risk_sellers2 = length(a2_ds) - N_dcfp;
@@ -77,14 +78,4 @@ risk_idx2 = max(risk_idx2, 0.01);
 
 end
 
-%{
-        if strcmp(param.CFUSE, 'CFP')
-            r_idx = N_at_risk_sellers1 / N_nat_buyers;
-            %r_idx = N_at_risk_sellers1 / ( length(a2_ds) );
-            %r_idx = N_at_risk_sellers1 / ( length(a1_ds) + length(a2_ds) );
-        else
-            r_idx = N_at_risk_sellers2 / N_nat_buyers;
-            %r_idx = N_at_risk_sellers2 / length(a2_ds);
-        end
-%}
 

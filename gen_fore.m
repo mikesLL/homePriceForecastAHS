@@ -28,9 +28,14 @@ idx_use = all([ ds_use.YEAR >= 1988, ds_use.YEAR <= 2012, ds_use.city_id == city
 
 X_city_fund =  [ ds_use.RET(idx_use) ds_use.RP(idx_use) ds_use.PI_ratio(idx_use)];
 
+%X_city_micro =   ds_use.risk_idx2(idx_use) ;
+
 X_city_micro =  [ ds_use.risk_idx(idx_use) ...                                 % proportion at-risk households
-                  ds_use.risk_idx2(idx_use) ...                                % proportion potential buyers
-                  ds_use.risk_idx(idx_use) ./ ds_use.risk_idx2(idx_use) ];     % ratio at-risk households to potential buyers
+                  ds_use.risk_idx2(idx_use) ];
+              
+%X_city_micro =  [ ds_use.risk_idx(idx_use) ...                                 % proportion at-risk households
+%                  ds_use.risk_idx2(idx_use) ...                                % proportion potential buyers
+%                  ds_use.risk_idx(idx_use) ./ ds_use.risk_idx2(idx_use) ];     % ratio at-risk households to potential buyers
                  
 X_city_other = [ ds_use.APR(idx_use) ds_use.POPCHG(idx_use) ds_use.PCICHG(idx_use) ...
     ds_use.NU2POP(idx_use) ds_use.EMPCHG(idx_use) ...
