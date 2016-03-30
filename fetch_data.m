@@ -1,8 +1,8 @@
 %{
 fetch_data.m
-Script to read in data on largest housing markets from FRED 
+Script to load AHS Microdata and read in data on largest housing markets from FRED 
 
-Copyright A. Michael Sharifi
+Copyright A. Michael Sharifi, 2016
 
 %}
 fromdate = '01/01/1986';   % beginning of date range for historical data

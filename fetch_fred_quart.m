@@ -1,6 +1,12 @@
+%{
+fetch_fred_quart.m
+script reads in series_codes and connection c and retrives associated data
+
+Copyright A. Michael Sharifi, 2016
+%}
+
 function [ ds ] = fetch_fred_quart(c, param, fromdate, todate, series_codes )
 
-%%
 rent2014 = param.rent2014;
 price2014 = param.price2014;
 
@@ -13,14 +19,12 @@ emp_series = series_codes.emp_code;
 lf_series = series_codes.lf_code;
 urate_series = series_codes.urate_code;
 
-%hpi_series = 'ATNHPIUS31084Q';
 d = fetch(c,hpi_series,fromdate,todate);  
 dateseries_quart = d.Data(:,1);
 
 apr_series = 'MORTGAGE30US';
 APR = .01* gen_quart(c, dateseries_quart, apr_series, fromdate, todate, 0 );
 
-%hpi_series = 'ATNHPIUS31084Q';
 price_idx = gen_quart(c, dateseries_quart, hpi_series, fromdate, todate, 0);
 price = price_idx .* price2014 / price_idx(end);
 
@@ -89,3 +93,18 @@ ds.URATE = urate;
 
 end
 
+
+
+function [ series_perc_chg ] = gen_perc_chg( series_in, h_step, fut_flag )
+
+series_perc_chg = zeros(size(series_in));
+
+i_begin = h_step + 1;                       % + fut_flag.*h_step;
+i_end = length(series_in) - (h_step + 1);   % + fut_flag.*h_step;
+
+for i = i_begin : i_end
+    i_use = i + fut_flag .* h_step;
+    series_perc_chg(i) = log(series_in(i_use)) - log(series_in(i_use - h_step  ));
+end
+
+end

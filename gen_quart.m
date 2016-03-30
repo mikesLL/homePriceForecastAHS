@@ -39,15 +39,3 @@ end
 
 
 end
-
-
-%apr_series = 'MORTGAGE30US';
-%d = fetch(c,apr_series,fromdate,todate);
-%APR = zeros(length(dateseries_quart),1);
-
-%idx_count = 1:length(d.Data);
-%idx_mod = mod(idx_count, 52);
-%idx_keep = ( idx_mod == 1 );
-%APR_tmp = d.Data(idx_keep,2);
-%APR = APR_tmp(2:end);
-
