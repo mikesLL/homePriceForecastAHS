@@ -35,7 +35,6 @@ idx_PMT_ERROR = (a2_ds.PMT < 0 );
 a2_ds.PMT(idx_PMT_ERROR) = med_PMT;
 
 a2_ds.RUNITS = a2_ds.VALUE / med_VAL ;
-%a2_ds.RUNITS = ones(length(a2_ds),1);
 
 
 end

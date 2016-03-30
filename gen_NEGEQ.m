@@ -7,21 +7,42 @@ function [ WCF, N_dcfp, N_cfp ] = gen_NEGEQ(param, a2_ds )
 % want: N_negeg: the number of households with negative equity
 
 %save('save_gen_NEGEQ');
+
+int_tmp = a2_ds.INT( a2_ds.INT > 0.0 );
+
+if ~isempty(int_tmp)
+    if mean(int_tmp > 500.0)
+        a2_ds.INT = 1.0 / 10000.0 * a2_ds.INT ;
+    end
+end
+
+if isempty(int_tmp)
+    a2_ds.INT = max( .01 * a2_ds.INTW + .0001* a2_ds.INTF, 0.0 );
+end
+
+
 %save('save_gen_WCF');
 TERM = a2_ds.TERM;
 YRMOR = a2_ds.YRMOR;
 AMMORT = a2_ds.AMMORT;
 %a2_ds.RUNITS = max(a2_ds.RUNITS, .5);
 %a2_ds.RUNITS = min(a2_ds.RUNITS, 1.5);
+
 PMT = 12* a2_ds.PMT ./ a2_ds.RUNITS;
+PMT2 = 12.0 .* a2_ds.PMT;
+
+%a2_ds.INT = a2_ds.PMT ./ a2_ds.AMMORT;
 
 CURR_YEAR = param.CURR_YEAR;
 
 rent = .8*param.P_HR;
 %rent = .6*param.P_HR;
 
+%T_LEFT = max(YRMOR + TERM - CURR_YEAR, 0.0);
+%T_INTO = min(CURR_YEAR - YRMOR, 0.0);
 T_LEFT = max(YRMOR + TERM - CURR_YEAR, 0.0);
-T_INTO = min(CURR_YEAR - YRMOR, 0.0);
+%T_INTO = min(CURR_YEAR - YRMOR, 0.0);
+T_INTO = max( CURR_YEAR - YRMOR, 0.0 );
 
 %delta1 = 1.01 /( 1 + param.APR + .02 );
 delta1 = 1.02 /( 1 + .055 );
@@ -46,8 +67,19 @@ WCF(mbal_idx) = delta2_mult(mbal_idx).*(rent - PMT(mbal_idx)) + delta3_mult(mbal
 
 MBAL = AMMORT./a2_ds.RUNITS.*( 1 + max(a2_ds.INT, 0.0) ).^T_INTO - T_INTO.*PMT;
 
+idx1_bal = ( T_LEFT > 0 ) ;
+
+MBAL2 = zeros(size(MBAL));
+MBAL2_tmp = MBAL2;
+MBAL2_tmp(idx1_bal) = AMMORT(idx1_bal) .*( 1.0 + max(a2_ds.INT(idx1_bal), 0.0) ).^T_INTO(idx1_bal) - T_INTO(idx1_bal).*PMT2(idx1_bal);
+
+MBAL2 = MBAL2_tmp;
+
 N_dcfp = sum( param.med_val >= MBAL );
 N_cfp = sum( param.med_val >= MBAL );
+
+N_dcfp = sum( a2_ds.VALUE >= MBAL2 );
+N_cfp = sum( a2_ds.VALUE >= MBAL2);
 
 end
 
