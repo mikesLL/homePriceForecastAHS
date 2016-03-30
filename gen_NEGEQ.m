@@ -5,8 +5,7 @@
 function [ WCF, N_dcfp, N_cfp ] = gen_NEGEQ(param, a2_ds )
 
 % want: N_negeg: the number of households with negative equity
-
-%save('save_gen_NEGEQ');
+% save('save_gen_NEGEQ');
 
 int_tmp = a2_ds.INT( a2_ds.INT > 0.0 );
 

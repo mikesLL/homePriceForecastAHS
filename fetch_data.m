@@ -13,6 +13,16 @@ addpath('readin');
 load dsreadin_codes;
 load smsa_table;
 load newhouse_flat;
+
+newhouse_flat.INTC = zeros(length( newhouse_flat ) ,1 );   %INTC: interest rate combination
+
+idx_int1 = ( newhouse_flat.INT > 0.0 );
+newhouse_flat.INTC( idx_int1 ) = 1.0 / 10000.0 * newhouse_flat.INT;
+
+idx_int2 = ( newhouse_flat.INTW > 0.0 );
+newhouse_flat.INTC( idx_int2 ) = 1.0 / 100.0 * newhouse_flat.INTW + 0.125 /100.0 * newhouse_flat.INTF;
+
+
 load dsreadin_macro_data;
 
 c = fred('https://research.stlouisfed.org/fred2/');     % connection to FRED Data
