@@ -7,6 +7,7 @@ function [ WCF, N_dcfp, N_cfp ] = gen_NEGEQ(param, a2_ds )
 % want: N_negeg: the number of households with negative equity
 % save('save_gen_NEGEQ');
 
+%{
 int_tmp = a2_ds.INT( a2_ds.INT > 0.0 );
 
 if ~isempty(int_tmp)
@@ -18,7 +19,7 @@ end
 if isempty(int_tmp)
     a2_ds.INT = max( .01 * a2_ds.INTW + .0001* a2_ds.INTF, 0.0 );
 end
-
+%}
 
 %save('save_gen_WCF');
 TERM = a2_ds.TERM;
@@ -70,7 +71,8 @@ idx1_bal = ( T_LEFT > 0 ) ;
 
 MBAL2 = zeros(size(MBAL));
 MBAL2_tmp = MBAL2;
-MBAL2_tmp(idx1_bal) = AMMORT(idx1_bal) .*( 1.0 + max(a2_ds.INT(idx1_bal), 0.0) ).^T_INTO(idx1_bal) - T_INTO(idx1_bal).*PMT2(idx1_bal);
+%MBAL2_tmp(idx1_bal) = AMMORT(idx1_bal) .*( 1.0 + max(a2_ds.INT(idx1_bal), 0.0) ).^T_INTO(idx1_bal) - T_INTO(idx1_bal).*PMT2(idx1_bal);
+MBAL2_tmp(idx1_bal) = AMMORT(idx1_bal) .*( 1.0 + max(a2_ds.INTC(idx1_bal), 0.0) ).^T_INTO(idx1_bal) - T_INTO(idx1_bal).*PMT2(idx1_bal);
 
 MBAL2 = MBAL2_tmp;
 

@@ -17,11 +17,10 @@ load newhouse_flat;
 newhouse_flat.INTC = zeros(length( newhouse_flat ) ,1 );   %INTC: interest rate combination
 
 idx_int1 = ( newhouse_flat.INT > 0.0 );
-newhouse_flat.INTC( idx_int1 ) = 1.0 / 10000.0 * newhouse_flat.INT;
+newhouse_flat.INTC( idx_int1 ) = 1.0 / 10000.0 * newhouse_flat.INT( idx_int1 );
 
 idx_int2 = ( newhouse_flat.INTW > 0.0 );
-newhouse_flat.INTC( idx_int2 ) = 1.0 / 100.0 * newhouse_flat.INTW + 0.125 /100.0 * newhouse_flat.INTF;
-
+newhouse_flat.INTC( idx_int2 ) = 1.0 / 100.0 * newhouse_flat.INTW( idx_int2 ) + 0.125 /100.0 * newhouse_flat.INTF( idx_int2 );
 
 load dsreadin_macro_data;
 
