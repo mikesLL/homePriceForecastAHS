@@ -1,6 +1,7 @@
 function [ risk_idx, risk_idx2 ] = gen_risk_idx_quart(param, city_str, ds_use, newhouse_flat )
 
-save('save_gen_risk_idx');
+addpath('results');
+save('results/save_gen_risk_idx');
 
 newhouse_flat_years = unique(newhouse_flat.PUFYEAR);
 newhouse_flat_years = sort(newhouse_flat_years);
@@ -50,6 +51,11 @@ for id = 1:length(ds_use)
     end
 end
 
+
+end
+
+% thinking about removing these lines:
+%{}
 %%
 val = 0.0;
 for i=1:length(risk_idx)
@@ -75,7 +81,8 @@ end
 %%
 risk_idx = max(risk_idx, 0.01);
 risk_idx2 = max(risk_idx2, 0.01);
+%}
 
-end
+%end
 
 

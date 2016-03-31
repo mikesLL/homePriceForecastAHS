@@ -9,6 +9,7 @@ fromdate = '01/01/1986';   % beginning of date range for historical data
 todate = '01/01/2014';     % ending of date range for historical data
 
 addpath('readin');
+addpath('results');
 
 load dsreadin_codes;
 load smsa_table;
@@ -55,6 +56,6 @@ ds_use.risk_idx = zeros(length(ds_use),1);
 ds_use.risk_idx2 = zeros(length(ds_use),1);
 ds_use = gen_risk_idx_fn( param, dsreadin_codes, ds_use, newhouse_flat );
 
-save('fetch_data_save.mat');
+save('results/fetch_data_save.mat');
 
 

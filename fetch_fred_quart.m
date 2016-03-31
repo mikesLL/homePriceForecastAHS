@@ -1,6 +1,5 @@
 %{
-fetch_fred_quart.m
-script reads in series_codes and connection c and retrives associated data
+fetch_fred_quart.m reads in series_codes and connection c and retrives associated data
 
 Copyright A. Michael Sharifi, 2016
 %}
@@ -70,9 +69,6 @@ ds.MONTH = month(dateseries_quart);
 ds.QUARTER = floor( month(dateseries_quart) ./ 3.0 ) + 1;
 
 %generate the return dataset
-%ds = dataset;
-%ds.city_id = param.city_id*ones(size(year_vec));
-%ds.YEAR = year_vec;
 ds.RENT = rent; %ones(size(year_vec));      % dummy here!
 ds.PRICE = price; % ones(size(year_vec));     % dummy here!
 ds.APR = APR; %ones(size(year_vec));       % dummy here!
@@ -106,5 +102,47 @@ for i = i_begin : i_end
     i_use = i + fut_flag .* h_step;
     series_perc_chg(i) = log(series_in(i_use)) - log(series_in(i_use - h_step  ));
 end
+
+end
+
+
+
+function [ series_clean ] = gen_quart(c, dateseries_quart, series_str, fromdate, todate, agg_flag )
+
+d = fetch(c,series_str,fromdate,todate);
+series_clean = zeros(length(dateseries_quart),1);
+
+%%
+if (agg_flag == 0)
+    for i = 1:length(series_clean)
+        [loc, ~] = find(d.Data(:,1) <= dateseries_quart(i), 1, 'last');
+        
+        if ~isempty(loc)
+            series_clean(i) = d.Data(loc,2);
+        end
+    end
+end
+
+%%
+%disp(d.Frequency);
+if (agg_flag == 1)
+    if strcmp(d.Frequency, ' Annual')
+        h_back = 0;
+    elseif strcmp(d.Frequency, ' Quarterly')
+        h_back = 3;
+    else
+        h_back = 11;
+    end    
+    
+    for i = 1:length(series_clean)
+        [loc, ~] = find(d.Data(:,1) <= dateseries_quart(i), 1, 'last');
+        
+        if ~isempty(loc)
+            loc_beg = max(loc - h_back, 1);
+            series_clean(i) = sum( d.Data( loc_beg : loc,2 )) ;
+        end
+    end
+end
+
 
 end
