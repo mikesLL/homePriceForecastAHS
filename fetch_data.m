@@ -39,7 +39,7 @@ for city_id = 1:N_cities  %11:14    % = 1: N_cities
     param.seriesStr = dsreadin_codes.city_str{city_id};
     series_codes = dsreadin_codes(city_id,:);
     
-    ds_in0 = fetch_fred_quart(c, param, fromdate, todate, series_codes );
+    ds_in0 = fetch_data_fred(c, param, fromdate, todate, series_codes );
     ds_in0.spy_ret_fut = dsreadin_macro_data.spy_ret_fut;
     ds_in0.spy_ret = dsreadin_macro_data.spy_ret;
     ds_in0.spy_yield = dsreadin_macro_data.spy_yield;
@@ -54,7 +54,7 @@ close(c);
 %% generate the risk indices
 ds_use.risk_idx = zeros(length(ds_use),1);
 ds_use.risk_idx2 = zeros(length(ds_use),1);
-ds_use = gen_risk_idx_fn( param, dsreadin_codes, ds_use, newhouse_flat );
+ds_use = gen_risk_idx( param, dsreadin_codes, ds_use, newhouse_flat );
 
 save('results/fetch_data_save.mat');
 

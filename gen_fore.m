@@ -21,7 +21,8 @@ output: forecast, forecast combo, RMSE, portfolio weights
 
 function [ y_ds, y_res ] = gen_fore( city_id, ds_use, micro_flag )
 
-save('gen_fore_save.mat');
+addpatch('results');
+save('results/gen_fore_save.mat');
 
 %% micro_flag = flag;
 idx_use = all([ ds_use.YEAR >= 1988, ds_use.YEAR <= 2012, ds_use.city_id == city_id  ], 2);
@@ -129,3 +130,16 @@ y_res =  [ y_ds.fore_RMSE(t_end,:) y_ds.fore_naive_RMSE(t_end,:) y_ds.fore_combo
 
 end
 
+
+function r=rmse(data,estimate)
+% Function to calculate root mean square error from a data vector or matrix 
+% and the corresponding estimates.
+% Usage: r=rmse(data,estimate)
+% Note: data and estimates have to be of same size
+% Example: r=rmse(randn(100,100),randn(100,100));
+
+% delete records with NaNs in both datasets first
+I = ~isnan(data) & ~isnan(estimate); 
+data = data(I); estimate = estimate(I);
+
+r=sqrt(sum((data(:)-estimate(:)).^2)/numel(data));
