@@ -80,20 +80,3 @@ for t_use = (t_begin + h_step + 1) : t_end
 end
 
 end
-
-%ret_exante = [X_spy_ret_fut(t_use) + X_spy_yield(t_use), y_city(t_use) + X_rp(t_use) - .15, .7*X_apr(t_use), .5*X_apr(t_use)    ];
-%mu_h = .95*y_1f_combo(t_use,i_combo_use) + .9*X_rp(t_use); 
-%sharpe_ratio = mean( port_ret(45:t_end) ) / ( std( port_ret(45:t_end) )  );
-%util = mean( port_ret(45:t_end) ) - mv_gamma / 2 *  var( port_ret(45:t_end) ) ;
-
-%{
-    imagine something like this:
-    MU as above (ex-ante returns)
-    ret_MU = MU;
-    ret_realized = [.01 .04 .05 .02 ];
-    port_ret(t_use) = x_opt * ret_realized;
-    so it looks like i need: stock returns and future stock
-    returns; might as well get dividend yield
-%}
-
-

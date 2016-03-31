@@ -1,10 +1,8 @@
 %{
-main.m
-this script loads housing-related data using fetch_data_fn and then for each city computes h-step
-forecast and for each forecast computes OOS RMSE
-Then incorporates forecast into an mean-variance optimization problem and
+main.m loads housing-related data using fetch_data_fn and then for each city computes h-step
+forecast and for each forecast computes OOS RMSE. The script computes forecasts with and without 
+access to microdata. The script then incorporates the forecasts into an mean-variance optimization problem and
 evaluates performance
-
 Copyright A. Michael Sharifi 2016
 
 Dependencies:
@@ -13,29 +11,26 @@ results are stored as fetch_data_save.m
 %}
 
 clear all;
+addpath('results');
 load fetch_data_save; % load housing data from fetch_data.m
 param = gen_param; % load parameters
 
 %%
 N_cities = max(ds_use.city_id);
-N_stats = 40;                       % max number of stats computed
+N_stats = 40;                                                  % max number of stats computed
 
-% table2: RMSE 
-% table3: RMSE (normalized)
-% table2_mf: RMSE w/ micro vars
-% table3_mf: RMSE (normalized) w/ micro vars
-table2 = dataset( zeros( N_stats,1 ), 'VarNames', 'city1' );
+table2 = dataset( zeros( N_stats,1 ), 'VarNames', 'city1' );   % RMSE
 table2 = repmat(table2,1,N_cities);
 table2.Properties.VarNames = dsreadin_codes.city_str';
-table3 = table2;
-table2_mf = table2;
-table3_mf = table2;
+table3 = table2;                                               % RMSE (normalized)
+table2_mf = table2;                                            % RMSE w/micro vars 
+table3_mf = table2;                                            % RMSE (normalized) w/micro vars
 
-table4 = dataset( zeros(N_cities,1) );   %mu, std for portfolio with and without micro vars
+table4 = dataset( zeros(N_cities,1) );                         % portfolio stats 
 table4 = repmat(table4, 1, 5);
 table4.Properties.VarNames = {'mu0', 'std0', 'mu1', 'std1', 'cer' };
 
-%%
+%% print an example for Los Angeles
 city_id = 2;
 gen_plot(param, ds_use, city_id, 'LAX');
 
@@ -45,15 +40,15 @@ util1_store = zeros(N_cities,1);
 mv_gamma = 4;
 
 %%
-y_ds_store{N_cities} = dataset;
-y_ds_mf_store{N_cities} = dataset;
+y_ds_store{N_cities} = dataset;                               % forecasts
+y_ds_mf_store{N_cities} = dataset;                            % forecasts w/micro data
 
 %%
 for city_id = 1:N_cities
     disp(city_id);
     
-    micro_flag = 0;  % do not use microdata
-    [y_ds, y_res] = gen_fore( city_id, ds_use, micro_flag ); % fore, RMSE results for 1 particular city
+    micro_flag = 0;                                                      % do not use microdata
+    [y_ds, y_res] = gen_fore( city_id, ds_use, micro_flag );             % fore, RMSE results for 1 particular city
     table2(1:length(y_res), city_id) = dataset(y_res);
     table3(1:length(y_res), city_id) = dataset(y_res ./ y_res(1) );
     y_ds_store{city_id} = y_ds;
@@ -84,5 +79,5 @@ for city_id = 1:N_cities
     util_diff( city_id ) = util1 - util0;
 end
 
-save('main_save');
+save('results/main_save');
 
