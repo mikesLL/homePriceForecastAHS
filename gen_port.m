@@ -12,9 +12,9 @@ sharpe_ratio, util, port_ret, x_opt_store
 
 Copyright A. Michael Sharifi 2016
 %}
-
 function [ port_ds ] = gen_port(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma )
-save('gen_weights_save');
+addpath('results');
+save('gen_port_save');
 
 %%
 port_ds = dataset;

@@ -21,7 +21,7 @@ output: forecast, forecast combo, RMSE, portfolio weights
 
 function [ y_ds, y_res ] = gen_fore( city_id, ds_use, micro_flag )
 
-addpatch('results');
+addpath('results');
 save('results/gen_fore_save.mat');
 
 %% micro_flag = flag;
@@ -143,3 +143,5 @@ I = ~isnan(data) & ~isnan(estimate);
 data = data(I); estimate = estimate(I);
 
 r=sqrt(sum((data(:)-estimate(:)).^2)/numel(data));
+
+end

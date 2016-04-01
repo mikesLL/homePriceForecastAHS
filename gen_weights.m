@@ -13,6 +13,7 @@ sharpe_ratio, util, port_ret, x_opt_store
 
 function [ port_ds ] = gen_weights(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma )
 
+addpath('results');
 save('results/gen_weights_save');
 
 %%

@@ -1,8 +1,8 @@
 %{
 main.m loads housing-related data using fetch_data_fn and then for each city computes h-step
-forecast and for each forecast computes OOS RMSE. The script computes forecasts with and without 
-access to microdata. The script then incorporates the forecasts into an mean-variance optimization problem and
-evaluates performance
+forecast and for each forecast computes out-of-sample RMSE. The script computes forecasts with and without 
+access to microdata. The script then incorporates the forecasts into a mean-variance optimization problem and
+evaluates performance.
 Copyright A. Michael Sharifi 2016
 
 Dependencies:
