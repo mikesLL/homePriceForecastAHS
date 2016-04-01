@@ -32,7 +32,7 @@ table4.Properties.VarNames = {'mu0', 'std0', 'mu1', 'std1', 'cer' };
 
 %% print an example for Los Angeles
 city_id = 2;
-gen_plot(param, ds_use, city_id, 'LAX');
+gen_plot(param, ds_use, city_id, dsreadin_codes.city_str(city_id));
 
 util_diff = zeros(N_cities,1);
 util0_store = zeros(N_cities,1);
