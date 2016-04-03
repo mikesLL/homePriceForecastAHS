@@ -49,7 +49,7 @@ for t_use = (t_begin + h_step + 1) : t_end
     
     y_1f_var_est = ( y_ds.RET_fut(t_begin:t_use) - y_ds.fore_combo(t_begin:t_use, i_combo_use) );
     %TODO: adjust all of these by inflation
-    % home price process
+    % housing process
     y_mean = y_ds.fore_combo(t_begin:t_use, i_combo_use) + X_rp(t_begin:t_use) - param.tau;
     y_act = y_ds.RET_fut(t_begin:t_use) + X_rp(t_begin:t_use ) - param.tau;
     y_resid = y_act - y_mean;
@@ -57,13 +57,9 @@ for t_use = (t_begin + h_step + 1) : t_end
     % stock return process
     spy_mean = mean(X_spy_ret)*ones(size(y_mean));
     spy_act = X_spy_ret(t_begin:t_use);
-    spy_resid = spy_act - spy_mean;
+    spy_resid = spy_mean - spy_act;
     
-    % mortgage process
-    mort_mean = X_apr(t_begin:t_use) - .02;  % observed mortgage rate; reduce this by inflation expectations
-    mort_act = X_apt(t_begin:t_use) - .025;
-    mort_resid = mort_act - mort_mean;    
-    
+    %
     spy_var_est = X_spy_ret(t_begin:t_use); 
     
     h_ret_est = y_1f_var_est + X_rp(t_begin:t_use) - param.tau;  % impose mean process: from forecast

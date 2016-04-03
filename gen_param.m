@@ -13,5 +13,8 @@ param.Y_CC = 50000;
 
 param.year_beg = 1988;
 param.year_end = 2014;
+
+param.tau = .15; % represents taxes and transactions costs
+param.h_step = 4; % quarters; = 4 for 1 year and = 8 for 2 years
 end
 

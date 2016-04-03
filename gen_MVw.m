@@ -20,7 +20,7 @@ A = [ -1 0 0 0;  % stock min
        0 1  0 0; % house max
        0 -.8 -1 0; % mort min determined by x_h
        0 0  1 0; % mort max
-       0 0 0 -1; % rf min
+       0 0 0 -1; % tbill min
        1 1 1 1; ];
    
 b = [ 0;  % stock min
