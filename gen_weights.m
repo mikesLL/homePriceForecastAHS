@@ -17,6 +17,7 @@ addpath('results');
 save('results/gen_weights_save');
 h_step = param.h_step;
 
+%%TODO: add code for actual inflation and expected inflation
 %%
 port_ds = dataset;
 port_ds.sharpe_ratio = zeros(100,1);
@@ -60,9 +61,17 @@ for t_use = (t_begin + h_step + 1) : t_end
     spy_resid = spy_act - spy_mean;
     
     % mortgage process
-    mort_mean = X_apr(t_begin:t_use) - .02;  % observed mortgage rate; reduce this by inflation expectations
-    mort_act = X_apt(t_begin:t_use) - .025;
+    mort_mean = X_apr(t_begin:t_use) - .02;    % observed mortgage rate - expected inflation
+    mort_act = X_apr(t_begin:t_use) - .025;    % observed mortgage rate - actual inflation
     mort_resid = mort_act - mort_mean;    
+    
+    % tbill process
+    tbill_mean = X_apr(t_begin:t_use) - .02;   % tfor now: assume tbill rate is around morgage rate; tbill rate - expected inflation
+    tbill_act = X_apr(t_begin:t_use) - .01;    % tbill rate - realized inflation
+    tbill_resid = tbill_act - tbill_mean;
+    
+    OMEGA_tmp3 = cov([spy_resid, y_resid, mort_resid, tbill_resid]);
+
     
     spy_var_est = X_spy_ret(t_begin:t_use); 
     
