@@ -43,6 +43,14 @@ for city_id = 1:N_cities  %11:14    % = 1: N_cities
     ds_in0.spy_ret_fut = dsreadin_macro_data.spy_ret_fut;
     ds_in0.spy_ret = dsreadin_macro_data.spy_ret;
     ds_in0.spy_yield = dsreadin_macro_data.spy_yield;
+        
+    % new cols here
+    ds_in0.inf_exp = dsreadin_macro_data.inf_exp;
+    ds_in0.inf_act = dsreadin_macro_data.inf_act;
+    ds_in0.spy_yield = dsreadin_macro_data.spy_yield;
+    ds_in0.spy_yield = dsreadin_macro_data.spy_yield;
+    ds_in0.spy_yield = dsreadin_macro_data.spy_yield;
+    
     ds_in{city_id} = ds_in0;
    
 end
