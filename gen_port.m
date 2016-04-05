@@ -14,9 +14,10 @@ Copyright A. Michael Sharifi 2016
 %}
 function [ port_ds ] = gen_port(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma )
 addpath('results');
-save('gen_port_save');
+save('results/gen_port_save');
 
 %%
+i_combo_use = param.i_combo_use;
 port_ds = dataset;
 port_ds.mean_est = zeros(length(y_ds),1);
 port_ds.std_est = zeros(length(y_ds),1);
@@ -24,15 +25,10 @@ port_ds.sharpe_ratio = zeros(length(y_ds),1);
 port_ds.sharpe_ratio = zeros(length(y_ds),1);
 port_ds.util = zeros(length(y_ds),1);
 port_ds.port_ret = zeros(length(y_ds),1);
-%port_ds.x_opt = zeros(length(y_ds),4);
 port_ds.x_opt = zeros(length(y_ds),5);
 port_ds.valid = zeros(length(y_ds),1);
 
-rf = .01;
-i_combo_use = 4;
-
 idx_use = all ([ ds_use.city_id == city_id, ds_use.YEAR >= param.year_beg , ds_use.YEAR <= param.year_end ] ,2 );
-%X_apr = ds_use.APR(idx_use);
 X_rp = ds_use.RP(idx_use);
 X_spy_ret = ds_use.spy_ret(idx_use);
 X_spy_ret_fut = ds_use.spy_ret_fut(idx_use);
@@ -42,7 +38,7 @@ X_spy_yield = ds_use.spy_yield(idx_use);
 X_inf_exp = ds_use.inf_exp(idx_use);
 X_inf_act = ds_use.inf_act(idx_use);
 
-X_apr = .6*ds_use.apr30yr(idx_use);
+X_apr = param.mort_eff .* ds_use.apr30yr(idx_use);
 X_bond = ds_use.tbond10yr(idx_use);
 X_bill = ds_use.tbill1yr(idx_use);
 
@@ -50,22 +46,16 @@ X_bill = ds_use.tbill1yr(idx_use);
 t_begin = find(y_ds.valid,1,'first');
 t_end = find(y_ds.valid,1,'last');
 
-h_step = 4;
+h_step = param.h_step;
 mu_h = 0;
-mu_x = .065; % + X_spy_yield(t_use);
-t_cost = .00;
-OMEGA = zeros(4,4);
+%mu_x = .065; % + X_spy_yield(t_use);
+%t_cost = .00;
+%OMEGA = zeros(4,4);
 
 %%
 for t_use = (t_begin + h_step + 1) : t_end
-    t_est = t_use - 4;
+    t_est = t_use - h_step;
     port_ds.valid(t_use) = 1;
-    
-    %compute home price forecast error variance
-    y_1f_var_est = ( y_ds.RET_fut(t_begin:t_use) - y_ds.fore_combo(t_begin:t_use, i_combo_use) );
-    spy_var_est = X_spy_ret(t_begin:t_use);
-    
-    OMEGA(1:2,1:2) = cov([spy_var_est, y_1f_var_est]);
     
     %% adding work here
     % home price process and residuals
@@ -106,15 +96,10 @@ for t_use = (t_begin + h_step + 1) : t_end
     mu_tbond = X_bond(t_use) - X_inf_exp(t_use);
     mu_tbill = X_bill(t_use) - X_inf_exp(t_use);
    
-    %mu_rf = 0.0; %.5*mu_apr;
-    %MU = [mu_x mu_h mu_apr mu_rf ]';
     MU = [mu_h mu_apr mu_spy mu_tbond mu_tbill ]';
     
     port_ds.x_opt(t_use,:) = gen_MVw( MU, OMEGA, mv_gamma, param.H_MAX );
     
-    %ret_exante = [X_spy_ret_fut(t_use) + X_spy_yield(t_use), ...
-    %    y_ds.RET_fut(t_use) + X_rp(t_use) , ...
-    %    .7*X_apr(t_use), .5*X_apr(t_use) ];
     ret_exante = [  y_ds.RET_fut(t_use) + X_rp(t_use) - X_inf_act(t_use) , ...
                     X_apr(t_use) - X_inf_act(t_use), ...
                     X_spy_ret_fut(t_use) + X_spy_yield(t_use) - X_inf_act(t_use), ...

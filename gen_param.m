@@ -14,8 +14,11 @@ param.Y_CC = 50000;
 param.year_beg = 1988;
 param.year_end = 2014;
 
-param.tau = 0.0; %.15; % represents taxes and transactions costs
+param.tau = 0.06; %.15; % represents transactions costs
 param.h_step = 4; % quarters; = 4 for 1 year and = 8 for 2 years
 param.H_MAX = 10;
+param.i_combo_use = 4;
+param.mort_eff = .65;      % effective mortgage rate after interest tax deduction
+
 end
 
