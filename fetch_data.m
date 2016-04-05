@@ -1,31 +1,30 @@
 %{
 fetch_data.m
-Script to load AHS Microdata and read in data on largest housing markets from FRED 
+Script loads AHS Microdata and read in housing markets data from FRED 
 
 Copyright A. Michael Sharifi, 2016
 
 %}
-fromdate = '01/01/1986';   % beginning of date range for historical data
-todate = '01/01/2014';     % ending of date range for historical data
-
 addpath('readin');
 addpath('results');
 
-load dsreadin_codes;
-load smsa_table;
-load newhouse_flat;
+fromdate = '01/01/1986';   % beginning date for historical data
+todate = '01/01/2014';     % ending date for historical data
+
+load dsreadin_codes; % dsreadin_codes store metro level series from FRED
+load newhouse_flat; % newhouse_flat store AHS microdata
+load dsreadin_macro_data; % macro data
+c = fred('https://research.stlouisfed.org/fred2/');     % connection to FRED Data
 
 newhouse_flat.INTC = zeros(length( newhouse_flat ) ,1 );   %INTC: interest rate combination
 
+% compute mortgage rates from AHS data
 idx_int1 = ( newhouse_flat.INT > 0.0 );
 newhouse_flat.INTC( idx_int1 ) = 1.0 / 10000.0 * newhouse_flat.INT( idx_int1 );
 
 idx_int2 = ( newhouse_flat.INTW > 0.0 );
 newhouse_flat.INTC( idx_int2 ) = 1.0 / 100.0 * newhouse_flat.INTW( idx_int2 ) + 0.125 /100.0 * newhouse_flat.INTF( idx_int2 );
 
-load dsreadin_macro_data;
-
-c = fred('https://research.stlouisfed.org/fred2/');     % connection to FRED Data
 
 N_cities = max(dsreadin_codes.city_id);
 ds_in{N_cities} = dataset;
@@ -47,16 +46,15 @@ for city_id = 1:N_cities  %11:14    % = 1: N_cities
     % new cols here
     ds_in0.inf_exp = dsreadin_macro_data.inf_exp;
     ds_in0.inf_act = dsreadin_macro_data.inf_act;
-    ds_in0.spy_yield = dsreadin_macro_data.spy_yield;
-    ds_in0.spy_yield = dsreadin_macro_data.spy_yield;
-    ds_in0.spy_yield = dsreadin_macro_data.spy_yield;
+    ds_in0.tbill1yr = dsreadin_macro_data.tbill1yr;
+    ds_in0.apr30yr = dsreadin_macro_data.apr30yr;
+    ds_in0.tbond10yr = dsreadin_macro_data.tbond10yr;
     
     ds_in{city_id} = ds_in0;
    
 end
 
 ds_use = vertcat(ds_in{:});   % ds_pool now contains pooled data for all cities
-
 close(c);
 
 %% generate the risk indices
