@@ -31,8 +31,9 @@ table4 = repmat(table4, 1, 5);
 table4.Properties.VarNames = {'mu0', 'std0', 'mu1', 'std1', 'cer' };
 
 %% print an example for Los Angeles
-if false
-    for city_id = 2:2 %1:17
+if true
+    for city_id = 1:17
+        disp(city_id);
         gen_plot(param, ds_use, city_id, dsreadin_codes.city_str(city_id));
     end
 end
@@ -40,7 +41,7 @@ end
 util_diff = zeros(N_cities,1);
 util0_store = zeros(N_cities,1);
 util1_store = zeros(N_cities,1);
-mv_gamma = 4;
+mv_gamma = param.mv_gamma;
 
 %%
 y_ds_store{N_cities} = dataset;                               % forecasts

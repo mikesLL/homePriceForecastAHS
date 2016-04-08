@@ -1,14 +1,16 @@
 %{
 gen_port.m
+this script uses a home price forecast to generate portfolio weights and
+evaluate portfolio performance
 
-use home price forecast to generate portfolio weights
-evaluate portfolio
+inputs:
+param, city_id, ds_use (relevant dataset), y_ds (price appreciation), 
+ mu_h_flag (flag to allow residential investment), mv_gamma (mean-variance
+ risk preference)
 
-input: city, dataset, flag, gamma
-output: forecast, forecast combo, RMSE, portfolio weights
-
-port_ds should include:
-sharpe_ratio, util, port_ret, x_opt_store
+output:
+port_ds (portfolio dataset includes sharpe ratio, utility, returns, 
+and port weights)
 
 Copyright A. Michael Sharifi 2016
 %}
@@ -17,7 +19,6 @@ addpath('results');
 save('results/gen_port_save');
 
 %%
-i_combo_use = param.i_combo_use;
 port_ds = dataset;
 port_ds.mean_est = zeros(length(y_ds),1);
 port_ds.std_est = zeros(length(y_ds),1);
@@ -33,8 +34,6 @@ X_rp = ds_use.RP(idx_use);
 X_spy_ret = ds_use.spy_ret(idx_use);
 X_spy_ret_fut = ds_use.spy_ret_fut(idx_use);
 X_spy_yield = ds_use.spy_yield(idx_use);
-
-%% adding new stuff here!
 X_inf_exp = ds_use.inf_exp(idx_use);
 X_inf_act = ds_use.inf_act(idx_use);
 
@@ -59,7 +58,7 @@ for t_use = (t_begin + h_step + 1) : t_end
     
     %% adding work here
     % home price process and residuals
-    y_exp = y_ds.fore_combo(t_begin:t_est, i_combo_use) + X_rp(t_begin:t_est) - param.tau - X_inf_exp(t_begin:t_est);
+    y_exp = y_ds.fore_combo(t_begin:t_est, param.i_combo_use) + X_rp(t_begin:t_est) - param.tau - X_inf_exp(t_begin:t_est);
     y_act = y_ds.RET_fut(t_begin:t_est) + X_rp(t_begin:t_est ) - param.tau - X_inf_act(t_begin:t_est);
     y_resid = y_act - y_exp;
     
@@ -88,7 +87,7 @@ for t_use = (t_begin + h_step + 1) : t_end
     
     %%
     if ( mu_h_flag >= 1 )  % enter current year home price forecast
-        mu_h = y_ds.fore_combo(t_use,i_combo_use) + X_rp(t_use) - param.tau - X_inf_exp(t_use);
+        mu_h = y_ds.fore_combo(t_use,param.i_combo_use) + X_rp(t_use) - param.tau - X_inf_exp(t_use);
     end
     
     mu_apr =  X_apr(t_use) - X_inf_exp(t_use);
@@ -117,6 +116,12 @@ for t_use = (t_begin + h_step + 1) : t_end
     port_ds.util(t_use) = mean( port_ds.port_ret(idx_use2) ) - mv_gamma / 2.0 * var( port_ds.port_ret(idx_use2) ) ;
 end
 
+%% TODO: add stuff here
+% right about here, we are finished evaluating the portfolio and can print
+% out the results; something like:
+% figre; plot(port_ds.x_opt);
+% ALSO: add a flag at the top / in parameters which tells you whether or
+% not to print out the results
 end
 
 
