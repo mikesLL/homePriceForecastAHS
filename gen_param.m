@@ -18,6 +18,6 @@ param.H_MAX = 10; % maximum house to net worth
 param.i_combo_use = 4;
 param.mort_eff = .66;      % effective mortgage rate after interest tax deduction
 
-param.mv_gamma = 4;
+param.mv_gamma = 4;  % let = 1,2,4,8,10
 end
 

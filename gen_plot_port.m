@@ -1,26 +1,14 @@
-function gen_plot_port(param, port_ds, city_str)
+function gen_plot_port(param, port_ds, ds_use, city_str, view_id)
 
 addpath('figs');
 
 idx1 = (port_ds.valid == 1);
-figure;
-plot(port_ds.x_opt(idx1,:));
-print(strcat('figs/x_opt_',char(lower(city_str))),'-depsc','-tiff'); 
-%print('SurfacePlot','-depsc','-tiff')
+figure('Position',[0 0 800 500 ]);
+plot(ds_use.YEAR(idx1), port_ds.x_opt(idx1,:));
+legend('H','X','M','B','Location', 'northoutside','Orientation','horizontal');
+str1 = sprintf('figs/x_opt_%s%d', char(lower(city_str)),(view_id));  
+print(str1, '-depsc','-tiff'); 
+print(str1, '-dpng'); 
+
 end
 
-
-%% want to be able to plot the portfolio for the city over time
-%{
-idx1 = all([ ds_use.city_id == city_id, ds_use.YEAR >= param.year_beg, ...
-    ds_use.YEAR <= param.year_end] , 2 );
-
-figure; plot(ds_use.YEAR(idx1),ds_use.risk_idx(idx1));
-print(strcat('figs/negeq_',char(lower(city_str))),'-dpng'); % Neg Eq homeowners
-
-figure; plot(ds_use.YEAR(idx1), ds_use.risk_idx2(idx1));
-print(strcat('figs/pb_',char(lower(city_str))),'-dpng');  % Potential Buyers
-
-figure; plot(ds_use.YEAR(idx1), ds_use.PRICE(idx1));
-print(strcat('figs/price_',char(lower(city_str))),'-dpng'); % Prices
-%}

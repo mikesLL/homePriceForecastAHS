@@ -26,56 +26,54 @@ port_ds.sharpe_ratio = zeros(length(y_ds),1);
 port_ds.sharpe_ratio = zeros(length(y_ds),1);
 port_ds.util = zeros(length(y_ds),1);
 port_ds.port_ret = zeros(length(y_ds),1);
-port_ds.x_opt = zeros(length(y_ds),5);
+port_ds.x_opt = zeros(length(y_ds),4);
 port_ds.valid = zeros(length(y_ds),1);
 
 idx_use = all ([ ds_use.city_id == city_id, ds_use.YEAR >= param.year_beg , ds_use.YEAR <= param.year_end ] ,2 );
-X_rp = ds_use.RP(idx_use);
-X_spy_ret = ds_use.spy_ret(idx_use);
-X_spy_ret_fut = ds_use.spy_ret_fut(idx_use);
-X_spy_yield = ds_use.spy_yield(idx_use);
-X_inf_exp = ds_use.inf_exp(idx_use);
-X_inf_act = ds_use.inf_act(idx_use);
+X_rp = ds_use.RP(idx_use);                               % rent to price ratio
+X_spy_ret = ds_use.spy_ret(idx_use);                     % S&P 500 return 
+X_spy_ret_fut = ds_use.spy_ret_fut(idx_use);             % S&P 500 return: future
+X_spy_yield = ds_use.spy_yield(idx_use);                 % S&P 500 yield
+X_inf_exp = ds_use.inf_exp(idx_use);                     % Ex-ante Inflation expectations
+X_inf_act = ds_use.inf_act(idx_use);                     % Ex-post Inflation
 
-X_apr = param.mort_eff .* ds_use.apr30yr(idx_use);
-X_bond = ds_use.tbond10yr(idx_use);
-X_bill = ds_use.tbill1yr(idx_use);
+X_apr = param.mort_eff .* ds_use.apr30yr(idx_use);       % effective mortgage rate
+X_bond = ds_use.tbond10yr(idx_use);                      % tbond rate (do not use)
+X_bill = ds_use.tbill1yr(idx_use);                       % tbill rate
 
-%%
 t_begin = find(y_ds.valid,1,'first');
 t_end = find(y_ds.valid,1,'last');
-
 h_step = param.h_step;
 mu_h = 0;
-%mu_x = .065; % + X_spy_yield(t_use);
-%t_cost = .00;
-%OMEGA = zeros(4,4);
+
+%% scratch code here
+spy_fore_all = zeros(length(port_ds),1);
+for i=2:length(spy_fore_all)
+    % real return forecast; update each year
+    spy_fore_all(i) = mean(X_spy_ret(1:i) + X_spy_yield(1:i) - X_inf_act(1:i) ); 
+end
 
 %%
 for t_use = (t_begin + h_step + 1) : t_end
     t_est = t_use - h_step;
     port_ds.valid(t_use) = 1;
     
-    %% adding work here
     % home price process and residuals
     y_exp = y_ds.fore_combo(t_begin:t_est, param.i_combo_use) + X_rp(t_begin:t_est) - param.tau - X_inf_exp(t_begin:t_est);
     y_act = y_ds.RET_fut(t_begin:t_est) + X_rp(t_begin:t_est ) - param.tau - X_inf_act(t_begin:t_est);
     y_resid = y_act - y_exp;
     
+    % stock return process and residuals
+    %spy_exp = mean(X_spy_ret)*ones(size(y_exp)) + X_spy_yield(t_begin:t_est) - X_inf_exp(t_begin:t_est);
+    %spy_exp = (X_spy_ret(t_begin:t_est) + X_spy_yield(t_begin:t_est) - X_inf_act(t_begin:t_est));
+    spy_exp = spy_fore_all(t_begin:t_est);
+    spy_act = X_spy_ret(t_begin:t_est) + X_spy_yield(t_begin:t_est) - X_inf_act(t_begin:t_est);
+    spy_resid = spy_act - spy_exp;
+    
     % mortgage process and residuals
     mort_exp = X_apr(t_begin:t_est) - X_inf_exp(t_begin:t_est);    % observed mortgage rate - expected inflation
     mort_act = X_apr(t_begin:t_est) - X_inf_act(t_begin:t_est);    % observed mortgage rate - actual inflation
     mort_resid = mort_act - mort_exp;
-    
-    % stock return process and residuals
-    spy_exp = mean(X_spy_ret)*ones(size(y_exp)) + X_spy_yield(t_begin:t_est) - X_inf_exp(t_begin:t_est);
-    spy_act = X_spy_ret(t_begin:t_est) + X_spy_yield(t_begin:t_est) - X_inf_act(t_begin:t_est);
-    spy_resid = spy_act - spy_exp;
-    
-    % tbond process and residuals
-    tbond_exp = X_bond(t_begin:t_est) - X_inf_exp(t_begin:t_est);   % tfor now: assume tbill rate is around morgage rate; tbill rate - expected inflation
-    tbond_act = X_bond(t_begin:t_est) - X_inf_act(t_begin:t_est);    % tbill rate - realized inflation
-    tbond_resid = tbond_act - tbond_exp;
     
     % tbill process and residuals
     tbill_exp = X_bill(t_begin:t_est) - X_inf_exp(t_begin:t_est);   % tfor now: assume tbill rate is around morgage rate; tbill rate - expected inflation
@@ -83,26 +81,21 @@ for t_use = (t_begin + h_step + 1) : t_end
     tbill_resid = tbill_act - tbill_exp;
    
     % estimate covariance
-    OMEGA = cov([y_resid, mort_resid, spy_resid, tbond_resid, tbill_resid  ]);
+    OMEGA = cov([y_resid, spy_resid, mort_resid, tbill_resid  ]);
     
-    %%
-    if ( mu_h_flag >= 1 )  % enter current year home price forecast
-        mu_h = y_ds.fore_combo(t_use,param.i_combo_use) + X_rp(t_use) - param.tau - X_inf_exp(t_use);
-    end
-    
+    %if ( mu_h_flag >= 1 )  % enter current year home price forecast
+    mu_h = y_ds.fore_combo(t_use,param.i_combo_use) + X_rp(t_use) - param.tau - X_inf_exp(t_use);
+    mu_spy = spy_fore_all(t_use);
     mu_apr =  X_apr(t_use) - X_inf_exp(t_use);
-    mu_spy = mean(ds_use.spy_ret(1:t_use)) - X_inf_exp(t_use);
-    mu_tbond = X_bond(t_use) - X_inf_exp(t_use);
     mu_tbill = X_bill(t_use) - X_inf_exp(t_use);
    
-    MU = [mu_h mu_apr mu_spy mu_tbond mu_tbill ]';
+    MU = [mu_h mu_spy mu_apr  mu_tbill ]';
     
-    port_ds.x_opt(t_use,:) = gen_MVw( MU, OMEGA, mv_gamma, param.H_MAX );
+    port_ds.x_opt(t_use,:) = gen_MVw( MU, OMEGA, mv_gamma, param.H_MAX, mu_h_flag );
     
-    ret_exante = [  y_ds.RET_fut(t_use) + X_rp(t_use) - X_inf_act(t_use) , ...
-                    X_apr(t_use) - X_inf_act(t_use), ...
+    ret_exante = [  y_ds.RET_fut(t_use) + X_rp(t_use) - X_inf_act(t_use) , ...       
                     X_spy_ret_fut(t_use) + X_spy_yield(t_use) - X_inf_act(t_use), ...
-                    X_bond(t_use) - X_inf_act(t_use), ...
+                    X_apr(t_use) - X_inf_act(t_use), ...           
                     X_bill(t_use) - X_inf_act(t_use)];
     
     port_ds.port_ret(t_use) = port_ds.x_opt(t_use,:) * ret_exante';

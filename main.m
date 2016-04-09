@@ -30,8 +30,8 @@ table4 = dataset( zeros(N_cities,1) );                         % portfolio stats
 table4 = repmat(table4, 1, 5);
 table4.Properties.VarNames = {'mu0', 'std0', 'mu1', 'std1', 'cer' };
 
-%% print an example for Los Angeles
-if true
+% save figures
+if false
     for city_id = 1:17
         disp(city_id);
         gen_plot(param, ds_use, city_id, dsreadin_codes.city_str(city_id));
@@ -49,8 +49,9 @@ y_ds_mf_store{N_cities} = dataset;                            % forecasts w/micr
 
 %%
 for city_id = 1:N_cities
-    disp(city_id);
-    
+    city_str = char( dsreadin_codes.city_str(city_id) );
+    fprintf( 'city_id = %d,  city_str = %s \n', city_id, city_str ); 
+   
     micro_flag = 0;                                                      % do not use microdata
     [y_ds, y_res] = gen_fore( city_id, ds_use, micro_flag );             % fore, RMSE results for 1 particular city
     table2(1:length(y_res), city_id) = dataset(y_res);
@@ -63,9 +64,27 @@ for city_id = 1:N_cities
     table3_mf(1:length(y_res_mf), city_id) = dataset(y_res_mf ./ y_res_mf(1) );
     y_ds_mf_store{city_id} = y_ds_mf;
     
-    mu_h_flag = 1;
+    mu_h_flag = 0; % equities and bills only
+    view_id = 0;
+    port_ds0 = gen_port(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma );
+    gen_plot_port(param, port_ds0, ds_use, city_str, view_id );
+    
+    mu_h_flag = 1; % housing, equities, and bills 
+    view_id = 1;
     port_ds = gen_port(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma );
+    gen_plot_port(param, port_ds, ds_use, city_str, view_id );
+    
+    mu_h_flag = 1; % housing, equities, and bills; use microdata
+    view_id = 2;
     port_ds_mf = gen_port(param, city_id, ds_use, y_ds_mf, mu_h_flag, mv_gamma );
+    gen_plot_port(param, port_ds_mf, ds_use, city_str, view_id );
+    
+    %view_flag = 1;
+    %micro_flag = 0;
+    %gen_plot_port(param, port_ds, ds_use, city_str, micro_flag );
+    
+    %micro_flag = 1;
+    %gen_plot_port(param, port_ds_mf, ds_use, city_str, micro_flag );
     
     table4.mu0(city_id) = port_ds.mean_est(96);
     table4.std0(city_id) = port_ds.std_est(96);
@@ -75,12 +94,18 @@ for city_id = 1:N_cities
     v1 = table4.mu1(city_id)-mv_gamma/2.0*(table4.std1(city_id).^2);
     table4.cer(city_id) = v1 - v0;
     
-    util0 = port_ds.util(96);
-    util1 = port_ds_mf.util(96);
-    disp( [util0 util1] );
+    
+    %util0 = port_ds.util(96);
+    %util1 = port_ds_mf.util(96);
+    
+    util0 = port_ds0.util(96);
+    util1 = port_ds.util(96);
+    util2 = port_ds_mf.util(96);
+    
+    disp( [util0 util1 util2] );
     util0_store( city_id ) = util0;
     util1_store( city_id ) = util1;
-    util_diff( city_id ) = util1 - util0;
+    util_diff( city_id ) = util2 - util1;
 end
 
 save('results/main_save');
