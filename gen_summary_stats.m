@@ -11,6 +11,8 @@ function [ table, table_pool ] = gen_summary_stats(param, ds_use, dsreadin_codes
 addpath('results');
 save('results/summary_stats_save');
 
+%%
+m = .00001; % convert units to 100000s for use in Case-Shiller Project
 N_cities2 = max(ds_use.city_id);
 table = dataset;
 table.city_str = (dsreadin_codes.city_str);
@@ -18,7 +20,16 @@ table.ret_mean = zeros(N_cities2,1);
 table.ret_std = zeros(N_cities2,1);
 table.ret_min = zeros(N_cities2,1);
 table.ret_max = zeros(N_cities2,1);
+table.rho_sim = zeros(N_cities2,1);
 
+table.gamma0 = zeros(N_cities2,1);   % cointegrating vector parameters
+table.gamma1 = zeros(N_cities2,1);
+table.alpha = zeros(N_cities2,1);
+table.rho = zeros(N_cities2,1);
+table.theta = zeros(N_cities2,1);
+table.sigma_err = zeros(N_cities2,1);
+
+%%
 for i = 1:N_cities2
     idx_use = all([ ds_use.city_id == i, ds_use.YEAR >= ...
         param.year_beg, ds_use.YEAR <= param.year_end ], 2);
@@ -26,8 +37,36 @@ for i = 1:N_cities2
     table.ret_std(i) = std(ds_use.RET(idx_use));
     table.ret_min(i) = min(ds_use.RET(idx_use));
     table.ret_max(i) = max(ds_use.RET(idx_use));
+    
+    y = ds_use.RET_fut(idx_use) ;       %
+    X = ds_use.RET(idx_use) ; 
+    stats = regstats(y,X,'linear');
+    table.rho_sim(i) = stats.beta(2);
+    
+    idx_vecm = all([ ds_use.city_id == i, ds_use.YEAR >= ...
+        param.year_beg, ds_use.YEAR <= param.year_end_pool ], 2);
+    
+    y = log(m*ds_use.RENT(idx_vecm));                        % step1: estimate cointegrating vector
+    X = log(m*ds_use.PRICE(idx_vecm));                       % use units in 100k for Case-Shiller Project
+    stats = regstats(y,X,'linear');
+    gamma0 = stats.tstat.beta(1); 
+    gamma1 = stats.tstat.beta(2);
+    
+    err = y - stats.yhat;                                        % step 2: calc residual
+    
+    y = ds_use.RET_fut(idx_vecm) - ds_use.inf_act(idx_vecm);       % step 3: estimate other parameters
+    X = [ds_use.RET(idx_vecm) - ds_use.inf_act(idx_vecm), err]; 
+    stats2 = regstats(y,X,'linear');
+    
+    table.gamma0(i) = gamma0; 
+    table.gamma1(i) = gamma1;
+    table.alpha(i) = stats2.beta(1);
+    table.rho(i) = stats2.beta(2);
+    table.theta(i) = stats2.beta(3);
+    table.sigma_err(i) = std(err);
 end
 
+%%
 N_reg = 3; % number of regions
 ds_use.reg_id = zeros(length(ds_use),1);
 west_id = [2, 10, 12, 14]; % LAX, SFR, SEA, SDG
@@ -37,7 +76,6 @@ east_id = [1, 6, 7, 8, 9, 15]; %NYM, PHI, MIA, ATL, BOS, TMPA
 idx_reg(:,1) = ismember( ds_use.city_id, west_id );
 idx_reg(:,2) = ismember( ds_use.city_id, cent_id );
 idx_reg(:,3) = ismember( ds_use.city_id, east_id );
-
 
 table_pool = dataset;
 table_pool.reg_str = {'west'; 'central'; 'east'};
@@ -71,8 +109,7 @@ for i = 1:N_reg
     
     err = y - stats.yhat; % step 2: calc residual
     
-    % step 3: estimate other parameters
-    y = ds_use.RET_fut(idx_use) - ds_use.inf_act(idx_use);
+    y = ds_use.RET_fut(idx_use) - ds_use.inf_act(idx_use);     % step 3: estimate other parameters
     X = [ds_use.RET(idx_use) - ds_use.inf_act(idx_use), err]; 
     stats2 = regstats(y,X,'linear');
     
