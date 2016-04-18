@@ -37,6 +37,7 @@ if false
         gen_plot(param, ds_use, city_id, dsreadin_codes.city_str(city_id));
     end
 end
+
 %%
 util_diff = zeros(N_cities,1);
 util0_store = zeros(N_cities,1);
@@ -97,8 +98,9 @@ for city_id = 1:N_cities
     util_diff( city_id ) = util2 - util1;
 end
 
-%% table5: want to write a table which keeps summary stats for each city
-%table5 = gen_summary_stats(
+%%
+[table5, table6] = gen_summary_stats(param, ds_use, dsreadin_codes ); % summary stats for each city
+
 %%
 
 save('results/main_save');

@@ -1,0 +1,159 @@
+%{
+gen_stats.m
+Generate full, in-sample statistics for each city
+input: city, dataset, flag, gamma
+output: forecast, forecast combo, RMSE, portfolio weights
+%}
+
+%function [ y_ds, y_res ] = gen_stats( city_id, ds_use, micro_flag )
+function [ table ] = gen_stats( ds_use, dsreadin_codes )
+
+addpath('results');
+save('results/gen_stats_save.mat');
+
+N_cities2 = max(dsreadin_codes.city_id);
+table = dataset;
+table.rho_est = zeros( N_cities2, 1);
+table.rho_alt = zeros( N_cities2, 1);
+table.rho_est5 = zeros( N_cities2, 1);
+table.rho_est95 = zeros( N_cities2, 1);
+
+%%
+for i = 1:N_cities2
+    city_id = i;
+    idx_use = all([ ds_use.YEAR >= 1988, ds_use.YEAR <= 2012, ds_use.city_id == city_id  ], 2);
+    
+    X = ds_use.RET(idx_use); 
+    y = ds_use.RET_fut(idx_use);
+    stats = regstats(y, X, 'linear');
+    table.rho_est(i) = stats.tstat.beta(2);
+    table.rho_est5(i) = stats.tstat.beta(2) - 2.0*stats.tstat.se(2);
+    table.rho_est95(i) = stats.tstat.beta(2) + 2.0*stats.tstat.se(2);
+    
+    table.rho_alt(i) = corr(y,X);
+end
+
+%%
+
+
+end
+
+%{
+X_city_fund =  [ ds_use.RET(idx_use) ds_use.RP(idx_use) ds_use.PI_ratio(idx_use)];
+
+%X_city_micro =   ds_use.risk_idx2(idx_use) ;
+
+X_city_micro =  [ ds_use.risk_idx(idx_use) ...                                 % proportion at-risk households
+                  ds_use.risk_idx2(idx_use) ];
+              
+%X_city_micro =  [ ds_use.risk_idx(idx_use) ...                                 % proportion at-risk households
+%                  ds_use.risk_idx2(idx_use) ...                                % proportion potential buyers
+%                  ds_use.risk_idx(idx_use) ./ ds_use.risk_idx2(idx_use) ];     % ratio at-risk households to potential buyers
+                 
+X_city_other = [ ds_use.APR(idx_use) ds_use.POPCHG(idx_use) ds_use.PCICHG(idx_use) ...
+    ds_use.NU2POP(idx_use) ds_use.EMPCHG(idx_use) ...
+    ds_use.LFCHG(idx_use) ds_use.URATE(idx_use) ...
+    ds_use.spy_ret(idx_use) ds_use.spy_yield(idx_use) ];
+
+if micro_flag
+    X_city = [X_city_fund, X_city_micro, X_city_other];
+else
+    X_city = [X_city_fund, X_city_other];
+end
+
+y_ds = dataset;
+y_ds.RET_fut = ds_use.RET_fut(idx_use);
+
+y_city = ds_use.RET_fut(idx_use);
+
+N_pred = size(X_city,2);                               % number of predictors to use (including bench); bench will be index 1
+N_naive = 2;
+N_combo = 5;
+
+y_ds.fore = zeros(length(y_ds), N_pred);
+y_ds.fore_naive = zeros(length(y_ds), N_naive );
+y_ds.fore_combo = zeros(length(y_ds), N_combo );
+
+y_ds.fore_RMSE = zeros(length(y_ds), N_pred);
+y_ds.fore_naive_RMSE = zeros(length(y_ds), N_naive );
+y_ds.fore_combo_RMSE = zeros(length(y_ds), N_combo );
+
+y_ds.valid = zeros(length(y_ds),1);
+%% construct estimation period
+err2_cum = zeros(N_pred, 1);
+
+%%
+h_step = 4; % h-step: 4 quarters
+h_hold = 4; % holdout period
+t_begin = 45; %begin halfway into dataset
+t_end = length(y_city)- h_step;
+
+%%
+for t_use = t_begin:t_end
+    t_est = t_use - h_step;  % 1-step forecast: information set
+    
+    for i=1:N_pred  % generate the simple predictors
+        pred = unique([1 i]);
+        stats_i = regstats(y_city(1:t_est),X_city(1:t_est,pred),'linear');  
+        y_ds.fore(t_use,i) = [1.0 X_city(t_use,pred)] * stats_i.beta;
+    end
+    
+    y_ds.fore_naive(t_use,1) = mean(X_city(1:t_use, 1 ) );           % naive: historical mean
+    y_ds.fore_naive(t_use,2) = X_city(t_use, 1 );                    % naive: lagged return
+    
+    y_ds.fore_combo(t_use,1) = 1/N_pred* sum(y_ds.fore(t_use,:)) ;   % forecast combo: average weight
+    y_ds.fore_combo(t_use,2) =  median( y_ds.fore(t_use,:) );        % forecast combo: median
+    
+    y_1f_sort = sort( y_ds.fore(t_use,:) );
+    y_ds.fore_combo(t_use,3) = mean(y_1f_sort(2:end-1) );            % forecast combo: truncate mean
+    
+    weights2 = zeros(N_pred,1);
+    
+    if t_use >= (t_begin + h_hold)   %t_use >= (t_begin + h_step)
+        y_ds.valid(t_use) = 1;
+        for i=1:N_pred
+            err2_cum(i) = sum( (y_city(t_begin:t_est) - y_ds.fore(t_begin:t_est,i)).^2 );
+        end
+        
+        for i=1:N_pred
+            weights2(i) = (  err2_cum(i)^-1 ) / sum( err2_cum .^ -1 );
+        end
+        
+        y_ds.fore_combo(t_use,4) = y_ds.fore(t_use,:) * weights2;
+        
+        [ ~, idx ] = sort( err2_cum );
+        y_ds.fore_combo(t_use, 5) = mean( y_ds.fore(t_use, idx(1:4) ) );
+        
+        for i=1:N_pred
+            y_ds.fore_RMSE(t_use,i) = rmse( y_city(t_begin + h_step:t_use), y_ds.fore(t_begin + h_step:t_use,i) );
+        end
+        
+        for i=1:N_naive
+            y_ds.fore_naive_RMSE(t_use,i) = rmse( y_city(t_begin + h_step:t_use), y_ds.fore_naive(t_begin + h_step:t_use,i) );
+        end
+        
+        for i=1:N_combo
+            y_ds.fore_combo_RMSE(t_use,i) = rmse( y_city(t_begin + h_step:t_use), y_ds.fore_combo(t_begin + h_step:t_use,i) );
+        end
+    end
+end
+
+y_res =  [ y_ds.fore_RMSE(t_end,:) y_ds.fore_naive_RMSE(t_end,:) y_ds.fore_combo_RMSE(t_end,:)]';
+
+%}
+
+
+function r=rmse(data,estimate)
+% Function to calculate root mean square error from a data vector or matrix 
+% and the corresponding estimates.
+% Usage: r=rmse(data,estimate)
+% Note: data and estimates have to be of same size
+% Example: r=rmse(randn(100,100),randn(100,100));
+
+% delete records with NaNs in both datasets first
+I = ~isnan(data) & ~isnan(estimate); 
+data = data(I); estimate = estimate(I);
+
+r=sqrt(sum((data(:)-estimate(:)).^2)/numel(data));
+
+end
