@@ -46,7 +46,6 @@ newhouse_flat.INTC( idx_int2 ) = 1.0 / 100.0 * newhouse_flat.INTW( idx_int2 ) + 
 N_cities = max(dsreadin_codes.city_id);
 ds_in{N_cities} = dataset;
 
-%%
 for city_id = 1:N_cities  %11:14    % = 1: N_cities
     
     fprintf('load city_id %d \n', city_id);
@@ -61,6 +60,7 @@ for city_id = 1:N_cities  %11:14    % = 1: N_cities
     ds_in0.spy_ret = dsreadin_macro_data.spy_ret;
     ds_in0.spy_yield = dsreadin_macro_data.spy_yield;
         
+    % new cols here
     ds_in0.inf_exp = dsreadin_macro_data.inf_exp;
     ds_in0.inf_act = dsreadin_macro_data.inf_act;
     ds_in0.tbill1yr = dsreadin_macro_data.tbill1yr;

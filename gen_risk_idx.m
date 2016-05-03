@@ -21,7 +21,6 @@ end
 end
 
 
-
 function [ risk_idx, risk_idx2 ] = gen_risk_idx_city(param, city_str, ds_use, newhouse_flat )
 
 addpath('results');
