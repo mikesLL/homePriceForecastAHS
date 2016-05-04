@@ -1,7 +1,12 @@
-% calc_res_sale3: 
-% must be consistent with the notes15 setup
+%{
+gen_NEGEQ.m
 
-function [ WCF, N_dcfp, N_cfp ] = gen_NEGEQ(param, a2_ds )
+Copyright A. Michael Sharifi
+%}
+
+function [ WCF, N_dcfp, N_cfp, N_negeq_cfp, N_negeq_cfn ] = gen_NEGEQ(param, a2_ds )
+
+%save('gen_NEGEQ_save');
 
 TERM = a2_ds.TERM;
 YRMOR = a2_ds.YRMOR;
@@ -17,6 +22,7 @@ PMT2 = 12.0 .* a2_ds.PMT;
 CURR_YEAR = param.CURR_YEAR;
 
 rent = .8*param.P_HR;
+rent_i = a2_ds.VALUE ./ param.med_val .* rent;
 %rent = .6*param.P_HR;
 
 %T_LEFT = max(YRMOR + TERM - CURR_YEAR, 0.0);
@@ -60,7 +66,17 @@ MBAL2 = MBAL2_tmp;
 N_dcfp = sum( param.med_val >= MBAL );
 N_cfp = sum( param.med_val >= MBAL );
 
-N_dcfp = sum( a2_ds.VALUE >= MBAL2 );
+% for now, this is a measure of the number of agents who are negative equity
+N_dcfp = sum( a2_ds.VALUE >= MBAL2 );   
 N_cfp = sum( a2_ds.VALUE >= MBAL2);
+
+% we would be interested in the number of agents who are both negative
+% equity and cash-flow positive; my guess is this may actually put upward
+% pressure on home prices
+
+% try something like:
+N_negeq_cfp = sum(  all( [ a2_ds.VALUE < MBAL2, rent_i >= PMT2 ], 2 ) ); 
+N_negeq_cfn = sum( all( [ a2_ds.VALUE < MBAL2, rent_i < PMT2 ], 2 ) ); 
+
 
 end

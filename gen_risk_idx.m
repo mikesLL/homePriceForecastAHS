@@ -59,10 +59,13 @@ for id = 1:length(ds_use)
         %N_nat_buyers = sum( .25/param.APR*a1_ds.ZINC2 >= param.med_val  );
         
         %[ WCF, N_dcfp, N_cfp ] = gen_WCF_lite(param, a2_ds );
-        [ WCF, N_dcfp, N_cfp ] = gen_NEGEQ(param, a2_ds );
+        [ WCF, N_dcfp, N_cfp, N_negeq_cfp, N_negeq_cfn ] = gen_NEGEQ(param, a2_ds );
         
-        N_at_risk_sellers1 = length(a2_ds) - N_cfp;
-        N_at_risk_sellers2 = length(a2_ds) - N_dcfp;
+        %N_at_risk_sellers1 = length(a2_ds) - N_cfp;
+        %N_at_risk_sellers2 = length(a2_ds) - N_dcfp;
+        
+        %ratio of negative equity but cash-flow positive agents to entire housing stock 
+        N_at_risk_sellers2 = N_negeq_cfp / length(a2_ds) ; 
         
         r_idx = N_at_risk_sellers2 / length(a2_ds);
         r_idx2 = N_nat_buyers / length(a2_ds);

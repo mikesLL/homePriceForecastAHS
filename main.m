@@ -66,10 +66,11 @@ for city_id = 1:N_cities
     table3_mf(1:length(y_res_mf), city_id) = dataset(y_res_mf ./ y_res_mf(1) );
     y_ds_mf_store{city_id} = y_ds_mf;
     
+    
     mu_h_flag = 0; % equities and bills only
     port_ds0 = gen_port(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma );
     
-    mu_h_flag = 1; % housing, equities, and bills 
+    mu_h_flag = 1; % housing, equities, and bills
     port_ds = gen_port(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma );
     
     mu_h_flag = 1; % housing, equities, and bills; use microdata
@@ -97,6 +98,7 @@ for city_id = 1:N_cities
     util0_store( city_id ) = util0;
     util1_store( city_id ) = util1;
     util_diff( city_id ) = util2 - util1;
+    
 end
 
 %%
