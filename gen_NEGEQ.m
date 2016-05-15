@@ -4,7 +4,7 @@ gen_NEGEQ.m
 Copyright A. Michael Sharifi
 %}
 
-function [ WCF, N_dcfp, N_cfp, N_negeq_cfp, N_negeq_cfn ] = gen_NEGEQ(param, a2_ds )
+function [ WCF, N_dcfp, N_cfp, N_negeq_cfp, N_negeq_cfn, N_paid_off ] = gen_NEGEQ(param, a2_ds )
 
 %save('gen_NEGEQ_save');
 
@@ -76,7 +76,9 @@ N_cfp = sum( a2_ds.VALUE >= MBAL2);
 
 % try something like:
 N_negeq_cfp = sum(  all( [ a2_ds.VALUE < MBAL2, rent_i >= PMT2 ], 2 ) ); 
-N_negeq_cfn = sum( all( [ a2_ds.VALUE < MBAL2, rent_i < PMT2 ], 2 ) ); 
+N_negeq_cfn = sum( all( [ a2_ds.VALUE < MBAL2, rent_i < PMT2 ], 2 ) );
+
+N_paid_off = sum( MBAL2 == 0.0 );
 
 
 end
