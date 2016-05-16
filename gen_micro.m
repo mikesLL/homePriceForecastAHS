@@ -18,6 +18,11 @@ param.max_mult = 40;
 param.min_mult = 10;
 param.Y_CC = 50000;
 
+ds_pool.md1 = zeros(length(ds_pool),1);  % md1: potential homebuyers
+ds_pool.md2 = zeros(length(ds_pool),1);  % md2: negative equity
+ds_pool.md3 = zeros(length(ds_pool),1);  % md3: paid-off homes
+ds_pool.md4 = zeros(length(ds_pool),1);  % md4: single-family rentals
+
 N_cities = max(dsreadin_codes.city_id);
 
 for city_id = 1:N_cities
@@ -27,17 +32,19 @@ for city_id = 1:N_cities
     i_beg = find( ds_pool.city_id == city_id, 1, 'first');
     i_end = find( ds_pool.city_id == city_id, 1, 'last');
     
-    [vec1, vec2] = ...
+    [md1, md2, md3, md4 ] = ...
         gen_micro_city(param, city_str, ds_pool(i_beg: i_end,:), newhouse_flat);
-    
-    ds_pool.risk_idx(i_beg:i_end) = vec1;
-    ds_pool.risk_idx2(i_beg:i_end) = vec2;
+   
+    ds_pool.md1(i_beg:i_end) = md1;
+    ds_pool.md2(i_beg:i_end) = md2;
+    ds_pool.md3(i_beg:i_end) = md3;
+    ds_pool.md4(i_beg:i_end) = md4;
 end
 
 end
 
 
-function [ vec1, vec2 ] = gen_micro_city(param, city_str, ds_use, newhouse_flat )
+function [md1, md2, md3, md4 ] = gen_micro_city(param, city_str, ds_use, newhouse_flat )
 
 addpath('results');
 save('results/save_gen_micro_city');
@@ -45,10 +52,10 @@ save('results/save_gen_micro_city');
 newhouse_flat_years = unique(newhouse_flat.PUFYEAR);
 newhouse_flat_years = sort(newhouse_flat_years);
 
-vec1 = zeros(length(ds_use),1);
-vec2 = zeros(length(ds_use),1);
-vec3 = zeros(length(ds_use),1);
-vec4 = zeros(length(ds_use),1);
+md1 = zeros(length(ds_use),1);
+md2 = zeros(length(ds_use),1);
+md3 = zeros(length(ds_use),1);
+md4 = zeros(length(ds_use),1);
 
 %%
 for id = 1:length(ds_use)
@@ -67,15 +74,19 @@ for id = 1:length(ds_use)
             char(city_str), length(a2_ds), length(a1_ds) );
         
         N_nat_buyers = sum( .35/param.APR*a2_ds.ZINC2 >= param.med_val  );
+        N_sfr_rent = sum( a2_ds.NUNITS <= 1 );
+        
         [ N_negeq, N_paid_off ] = gen_micro_vars(param, a1_ds );
 
-        N_at_risk_sellers2 = N_paid_off / length(a2_ds) ;
-       
-        vec1(id) = N_nat_buyers/length(a1_ds);
-        vec2(id) = N_negeq/length(a1_ds);
+        md1(id) = N_nat_buyers/length(a1_ds);
+        md2(id) = N_negeq/length(a1_ds);
+        md3(id) = N_paid_off / length(a1_ds);
+        md4(id) = N_sfr_rent / length(a1_ds);
     else
-        vec1(id) = -9;    % invalid / not-found marker
-        vec2(id) = -9;    % invalid / not-found marker
+        md1(id) = -9;    % invalid / not-found marker
+        md2(id) = -9;    % invalid / not-found marker
+        md3(id) = -9;
+        md4(id) = -9;
     end
 end
 

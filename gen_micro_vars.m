@@ -11,7 +11,7 @@ Copyright A. Michael Sharifi
 
 function [ N_negeq, N_paid_off ] = gen_micro_vars(param, a1_ds )
 
-save('gen_micro_vars_save');
+%save('gen_micro_vars_save');
 
 TERM = a1_ds.TERM;
 YRMOR_est = a1_ds.YRMOR_est;
@@ -21,7 +21,7 @@ PMT = 12.0 .* a1_ds.PMT;
 CURR_YEAR = param.CURR_YEAR;
 
 T_LEFT = max(YRMOR_est + TERM - CURR_YEAR, 0.0);    % years left on mortgage
-T_INTO = max( CURR_YEAR - YRMOR, 0.0 );             % years into mortgage
+T_INTO = max( CURR_YEAR - YRMOR_est, 0.0 );             % years into mortgage
 
 mbal_idx = ( T_LEFT > 0 ) ;
 
