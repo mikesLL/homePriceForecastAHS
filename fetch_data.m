@@ -3,6 +3,9 @@ fetch_data.m
 Script loads AHS Microdata and reads in housing market data from FRED 
 Copyright A. Michael Sharifi, 2016
 
+% variables to generate:
+1. 
+
 %}
 addpath('readin');
 addpath('results');
@@ -13,25 +16,26 @@ todate = '01/01/2014';     % ending date for historical data
 load dsreadin_codes; % dsreadin_codes store metro level series from FRED
 load newhouse_flat; % newhouse_flat store AHS microdata
 
-% look up LAX homebuyer incomes in 2005
+% look up LAX homeowner incomes in 2005
 idx_LAX_2005 = all([ newhouse_flat.SMSA == 4480, ...
     newhouse_flat.PUFYEAR == 2005, newhouse_flat.TENURE==1],2);
 fprintf('2005 mean LAX inc: %f\n', mean(newhouse_flat.ZINC2(idx_LAX_2005)));
 
 ds_lax = newhouse_flat(idx_LAX_2005,:);
 
-% look up LAX homebuyer incomes in 2005
-idx_LAX_2005 = all([ newhouse_flat.SMSA == 4480, ...
+% look up SDG homeowner incomes in 2005
+idx_SDG_2005 = all([ newhouse_flat.SMSA == 7320, ...
     newhouse_flat.PUFYEAR == 2005, newhouse_flat.TENURE==1],2);
-fprintf('2005 mean SDG inc: %f\n', mean(newhouse_flat.ZINC2(idx_LAX_2005)));
+fprintf('2005 mean SDG inc: %f\n', mean(newhouse_flat.ZINC2(idx_SDG_2005)));
 
-% look up LAX homebuyer incomes in 2005
-idx_LAX_2005 = all([ newhouse_flat.SMSA == 4480, ...
+% look up SFR homeowner incomes in 2005
+idx_SFR_2005 = all([ newhouse_flat.SMSA == 7360, ...
     newhouse_flat.PUFYEAR == 2005, newhouse_flat.TENURE==1],2);
-fprintf('2005 mean LAX inc: %f\n', mean(newhouse_flat.ZINC2(idx_LAX_2005)));
+fprintf('2005 mean SFR inc: %f\n', mean(newhouse_flat.ZINC2(idx_SFR_2005)));
 
 load dsreadin_macro_data; % macro data
-c = fred('https://research.stlouisfed.org/fred2/');     % connection to FRED Data
+%c = fred('https://research.stlouisfed.org/fred2/');     % connection to FRED Data
+c = fred;
 
 newhouse_flat.INTC = zeros(length( newhouse_flat ) ,1 );   %INTC: interest rate combination
 
@@ -75,10 +79,11 @@ ds_use = vertcat(ds_in{:});   % ds_pool now contains pooled data for all cities
 close(c);
 
 %% generate the risk indices
-ds_use.risk_idx = zeros(length(ds_use),1);
-ds_use.risk_idx2 = zeros(length(ds_use),1);
-ds_use = gen_risk_idx( param, dsreadin_codes, ds_use, newhouse_flat );
+%ds_use.risk_idx = zeros(length(ds_use),1);
+%ds_use.risk_idx2 = zeros(length(ds_use),1);
+ds_use = gen_micro( param, dsreadin_codes, ds_use, newhouse_flat );
 
+%%
 save('results/fetch_data_save.mat');
 
 

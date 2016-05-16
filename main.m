@@ -2,8 +2,7 @@
 main.m loads housing-related data using fetch_data_fn and then for each 
 city computes h-step forecast and for each forecast computes out-of-sample
 RMSE. The script computes forecasts with and without access to microdata.
-The script then incorporates the forecasts into a mean-variance optimization 
-problem and evaluates performance.
+
 Copyright A. Michael Sharifi 2016
 
 Dependencies:
@@ -13,7 +12,7 @@ results are stored as fetch_data_save.m
 
 clear all;
 addpath('results');
-load fetch_data_save; % load housing data from fetch_data.m
+load fetch_data_save;    % load housing data from fetch_data.m
 param = gen_param; % load parameters
 
 %%
