@@ -78,9 +78,7 @@ end
 ds_use = vertcat(ds_in{:});   % ds_pool now contains pooled data for all cities
 close(c);
 
-%% generate the risk indices
-%ds_use.risk_idx = zeros(length(ds_use),1);
-%ds_use.risk_idx2 = zeros(length(ds_use),1);
+%% add micro data
 ds_use = gen_micro( param, dsreadin_codes, ds_use, newhouse_flat );
 
 %%
