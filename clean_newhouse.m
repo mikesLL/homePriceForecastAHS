@@ -11,8 +11,6 @@ Copyright A. Michael Sharifi, 2016
 %%
 function [ a1_ds, a2_ds  ] = clean_newhouse(param, newhouse_flat )
 
-save('clean_newhouse_save');
-
 idx_yr = (newhouse_flat.PUFYEAR == param.CURR_YEAR); % years
 idx_SMSA = (newhouse_flat.SMSA == param.SMSA) ;
 
