@@ -54,13 +54,13 @@ for city_id = 1:N_cities
     fprintf( 'city_id = %d,  city_str = %s \n', city_id, city_str ); 
    
     micro_flag = 0;                                                      % do not use microdata
-    [y_ds, y_res] = gen_fore( city_id, ds_use, micro_flag );             % fore, RMSE results for 1 particular city
+    [y_ds, y_res, coeff_ds] = gen_fore( city_id, ds_use, micro_flag );             % fore, RMSE results for 1 particular city
     table2(1:length(y_res), city_id) = dataset(y_res);
     table3(1:length(y_res), city_id) = dataset(y_res ./ y_res(1) );
     y_ds_store{city_id} = y_ds;
     
     micro_flag = 1;  % use microdata
-    [y_ds_mf, y_res_mf] = gen_fore( city_id, ds_use, micro_flag ); % fore, RMSE results for 1 particular city
+    [y_ds_mf, y_res_mf, coeff_ds_mf] = gen_fore( city_id, ds_use, micro_flag ); % fore, RMSE results for 1 particular city
     table2_mf(1:length(y_res_mf), city_id) = dataset(y_res_mf);
     table3_mf(1:length(y_res_mf), city_id) = dataset(y_res_mf ./ y_res_mf(1) );
     y_ds_mf_store{city_id} = y_ds_mf;

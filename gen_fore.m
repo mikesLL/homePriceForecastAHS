@@ -19,7 +19,7 @@ output: forecast, forecast combo, RMSE, portfolio weights
 % y_lf_combo: combination forecasts
 % y_1f_combo: RMSE
 
-function [ y_ds, y_res ] = gen_fore( city_id, ds_use, micro_flag )
+function [ y_ds, y_res, coeff_ds ] = gen_fore( city_id, ds_use, micro_flag )
 
 %addpath('results');
 %save('results/gen_fore_save.mat');
@@ -72,6 +72,11 @@ h_hold = 4; % holdout period
 t_begin = 60; % begin halfway into dataset
 t_end = length(y_city)- h_step;
 
+%% ceofficient dataset
+coeff_ds = dataset;
+coeff_ds.rho = zeros(length(y_city),N_pred);
+coeff_ds.beta = zeros(length(y_city),N_pred);
+
 %%
 for t_use = t_begin:t_end
     t_est = t_use - h_step;  % 1-step forecast: information set
@@ -79,7 +84,15 @@ for t_use = t_begin:t_end
     for i=1:N_pred  % generate the simple predictors
         pred = unique([1 i]);
         stats_i = regstats(y_city(1:t_est),X_city(1:t_est,pred),'linear');  
+          
+        coeff_ds.rho(t_est,i) = stats_i.beta(2);
+        
+        if i>=2
+            coeff_ds.beta(t_est,i) = stats_i.beta(3);
+        end
+        
         y_ds.fore(t_use,i) = [1.0 X_city(t_use,pred)] * stats_i.beta;
+      
     end
     
     y_ds.fore_naive(t_use,1) = mean(X_city(1:t_use, 1 ) );           % naive: historical mean
