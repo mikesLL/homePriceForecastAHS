@@ -21,8 +21,8 @@ output: forecast, forecast combo, RMSE, portfolio weights
 
 function [ y_ds, y_res ] = gen_fore( city_id, ds_use, micro_flag )
 
-addpath('results');
-save('results/gen_fore_save.mat');
+%addpath('results');
+%save('results/gen_fore_save.mat');
 
 %% micro_flag = flag;
 idx_use = all([ ds_use.YEAR >= 1988, ds_use.YEAR <= 2012, ds_use.city_id == city_id  ], 2);
@@ -30,15 +30,10 @@ idx_use = all([ ds_use.YEAR >= 1988, ds_use.YEAR <= 2012, ds_use.city_id == city
 X_city_fund =  [ ds_use.RET(idx_use) ds_use.RP(idx_use) ds_use.PI_ratio(idx_use)];
 
 X_city_micro =  [ ds_use.md1(idx_use), ds_use.md2(idx_use) ...                                 % proportion at-risk households
-                  ds_use.md3(idx_use), ds_use.md4(idx_use) ];
-
-%X_city_micro =  [ ds_use.risk_idx(idx_use) ...                                 % proportion at-risk households
-%                  ds_use.risk_idx2(idx_use) ];
-              
-%X_city_micro =  [ ds_use.risk_idx(idx_use) ...                                 % proportion at-risk households
-%                  ds_use.risk_idx2(idx_use) ...                                % proportion potential buyers
-%                  ds_use.risk_idx(idx_use) ./ ds_use.risk_idx2(idx_use) ];     % ratio at-risk households to potential buyers
-                 
+                  ds_use.md3(idx_use), ds_use.md4(idx_use) ...
+                  ds_use.md5(idx_use), ds_use.md6(idx_use) ...
+                  ds_use.md7(idx_use) ];
+            
 X_city_other = [ ds_use.APR(idx_use) ds_use.POPCHG(idx_use) ds_use.PCICHG(idx_use) ...
     ds_use.NU2POP(idx_use) ds_use.EMPCHG(idx_use) ...
     ds_use.LFCHG(idx_use) ds_use.URATE(idx_use) ...
@@ -74,8 +69,7 @@ err2_cum = zeros(N_pred, 1);
 %%
 h_step = 4; % h-step: 4 quarters
 h_hold = 4; % holdout period
-t_begin = 60; % pretty darn close to right down the middle
-%t_begin = 45; %begin halfway into dataset
+t_begin = 60; % begin halfway into dataset
 t_end = length(y_city)- h_step;
 
 %%

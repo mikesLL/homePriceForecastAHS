@@ -9,8 +9,7 @@ want to compute:
 Copyright A. Michael Sharifi
 %}
 
-function [ N_negeq, N_paid_off, N_negeq_cfp, N_negeq_cfn, med_pmt_inc ] = ...
-    gen_micro_vars(param, a1_ds )
+function [ N_negeq, N_paid_off, N_negeq_cfp, N_negeq_cfn ] = gen_micro_vars(param, a1_ds )
 
 %save('gen_micro_vars_save');
 
@@ -40,7 +39,7 @@ N_negeq_cfn = sum( and( a1_ds.VALUE < MBAL, rent_i < PMT ) );
 % create index for new homeowners
 idx_newho = ( a1_ds.YRMOR_est >= (CURR_YEAR - 1 ) );
 
-med_pmt_inc = median( PMT(idx_newho) ./ a1_ds.ZINC2(idx_newho) );
+ PMT(idx_newho) ./ a1_ds.ZINC2(idx_newho)
 
 end
 

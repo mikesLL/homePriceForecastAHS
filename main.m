@@ -65,44 +65,43 @@ for city_id = 1:N_cities
     table3_mf(1:length(y_res_mf), city_id) = dataset(y_res_mf ./ y_res_mf(1) );
     y_ds_mf_store{city_id} = y_ds_mf;
     
-    %{
-    mu_h_flag = 0; % equities and bills only
-    port_ds0 = gen_port(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma );
-    
-    mu_h_flag = 1; % housing, equities, and bills
-    port_ds = gen_port(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma );
-    
-    mu_h_flag = 1; % housing, equities, and bills; use microdata
-    port_ds_mf = gen_port(param, city_id, ds_use, y_ds_mf, mu_h_flag, mv_gamma );
-    
+    %% this section includes work on portfolio optimization
     if false
-        gen_plot_port(param, port_ds0, ds_use, city_str, 0 ); % view_id = 0;
-        gen_plot_port(param, port_ds, ds_use, city_str, 1 ); % view_id = 1;
-        gen_plot_port(param, port_ds_mf, ds_use, city_str, 2 ); %view_id = 2;
+        mu_h_flag = 0; % equities and bills only
+        port_ds0 = gen_port(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma );
+        
+        mu_h_flag = 1; % housing, equities, and bills
+        port_ds = gen_port(param, city_id, ds_use, y_ds, mu_h_flag, mv_gamma );
+        
+        mu_h_flag = 1; % housing, equities, and bills; use microdata
+        port_ds_mf = gen_port(param, city_id, ds_use, y_ds_mf, mu_h_flag, mv_gamma );
+        
+        if false
+            gen_plot_port(param, port_ds0, ds_use, city_str, 0 ); % view_id = 0;
+            gen_plot_port(param, port_ds, ds_use, city_str, 1 ); % view_id = 1;
+            gen_plot_port(param, port_ds_mf, ds_use, city_str, 2 ); %view_id = 2;
+        end
+        
+        table4.mu0(city_id) = port_ds.mean_est(96);
+        table4.std0(city_id) = port_ds.std_est(96);
+        table4.mu1(city_id) = port_ds_mf.mean_est(96);
+        table4.std1(city_id) = port_ds_mf.std_est(96);
+        v0 = table4.mu0(city_id)-mv_gamma/2.0*(table4.std0(city_id).^2);
+        v1 = table4.mu1(city_id)-mv_gamma/2.0*(table4.std1(city_id).^2);
+        table4.cer(city_id) = v1 - v0;
+        
+        util0 = port_ds0.util(96);
+        util1 = port_ds.util(96);
+        util2 = port_ds_mf.util(96);
+        
+        disp( [util0 util1 util2] );
+        util0_store( city_id ) = util0;
+        util1_store( city_id ) = util1;
+        util_diff( city_id ) = util2 - util1;
     end
-    
-    table4.mu0(city_id) = port_ds.mean_est(96);
-    table4.std0(city_id) = port_ds.std_est(96);
-    table4.mu1(city_id) = port_ds_mf.mean_est(96);
-    table4.std1(city_id) = port_ds_mf.std_est(96);
-    v0 = table4.mu0(city_id)-mv_gamma/2.0*(table4.std0(city_id).^2);
-    v1 = table4.mu1(city_id)-mv_gamma/2.0*(table4.std1(city_id).^2);
-    table4.cer(city_id) = v1 - v0;
-    
-    util0 = port_ds0.util(96);
-    util1 = port_ds.util(96);
-    util2 = port_ds_mf.util(96);
-    
-    disp( [util0 util1 util2] );
-    util0_store( city_id ) = util0;
-    util1_store( city_id ) = util1;
-    util_diff( city_id ) = util2 - util1;
-    %}
-    
 end
 
-%%
-val = median(double(table3_mf),2);
+val = mean(double(table3_mf),2);
 %%
 [table5, table6] = gen_summary_stats(param, ds_use, dsreadin_codes ); % summary stats for each city
 
