@@ -22,10 +22,11 @@ output: forecast, forecast combo, RMSE, portfolio weights
 function [ y_ds, y_res, coeff_ds ] = gen_fore( city_id, ds_use, micro_flag )
 
 %addpath('results');
-%save('results/gen_fore_save.mat');
+save('gen_fore_save.mat');   % TODO: delete this when running model
 
 %% micro_flag = flag;
 idx_use = all([ ds_use.YEAR >= 1988, ds_use.YEAR <= 2012, ds_use.city_id == city_id  ], 2);
+
 
 X_city_fund =  [ ds_use.RET(idx_use) ds_use.RP(idx_use) ds_use.PI_ratio(idx_use)];
 
@@ -83,7 +84,11 @@ for t_use = t_begin:t_end
     
     for i=1:N_pred  % generate the simple predictors
         pred = unique([1 i]);
+        
         stats_i = regstats(y_city(1:t_est),X_city(1:t_est,pred),'linear');  
+        
+        stats_i_midas = reg_midas( y_city(1:t_est), X_city_fund(1:t_est,1), X_city(1:t_est,i) );
+        %stats_i_midas = reg_midas( y_city(1:t_est), X_city(1:t_est,i) );
           
         coeff_ds.rho(t_est,i) = stats_i.beta(2);
         

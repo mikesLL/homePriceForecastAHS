@@ -34,18 +34,7 @@ idx_SFR_2005 = all([ newhouse_flat.SMSA == 7360, ...
 fprintf('2005 mean SFR inc: %f\n', mean(newhouse_flat.ZINC2(idx_SFR_2005)));
 
 load dsreadin_macro_data; % macro data
-%c = fred('https://research.stlouisfed.org/fred2/');     % connection to FRED Data
-c = fred;
-
-newhouse_flat.INTC = zeros(length( newhouse_flat ) ,1 );   %INTC: interest rate combination
-
-% compute mortgage rates from AHS data
-idx_int1 = ( newhouse_flat.INT > 0.0 );
-newhouse_flat.INTC( idx_int1 ) = 1.0 / 10000.0 * newhouse_flat.INT( idx_int1 );
-
-idx_int2 = ( newhouse_flat.INTW > 0.0 );
-newhouse_flat.INTC( idx_int2 ) = 1.0 / 100.0 * newhouse_flat.INTW( idx_int2 ) + 0.125 /100.0 * newhouse_flat.INTF( idx_int2 );
-
+c = fred('https://research.stlouisfed.org/fred2/');     % connection to FRED Data
 
 N_cities = max(dsreadin_codes.city_id);
 ds_in{N_cities} = dataset;
