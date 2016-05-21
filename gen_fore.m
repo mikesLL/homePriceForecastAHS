@@ -27,8 +27,9 @@ save('gen_fore_save.mat');   % TODO: delete this when running model
 %% micro_flag = flag;
 idx_use = all([ ds_use.YEAR >= 1988, ds_use.YEAR <= 2012, ds_use.city_id == city_id  ], 2);
 
+%X_city_fund =  [ ds_use.RET(idx_use) ds_use.RP(idx_use) ds_use.PI_ratio(idx_use)];
 
-X_city_fund =  [ ds_use.RET(idx_use) ds_use.RP(idx_use) ds_use.PI_ratio(idx_use)];
+X_city_fund =  [ ds_use.ret_ql0(idx_use) ds_use.RP(idx_use) ds_use.PI_ratio(idx_use)];
 
 X_city_micro =  [ ds_use.md1(idx_use), ds_use.md2(idx_use) ...                                 % proportion at-risk households
                   ds_use.md3(idx_use), ds_use.md4(idx_use) ...
