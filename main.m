@@ -1,13 +1,12 @@
 %{
 main.m loads housing-related data using fetch_data_fn and then for each 
-city computes h-step forecast and for each forecast computes out-of-sample
-RMSE. The script computes forecasts with and without access to microdata.
+city computes h-step forecast and with out-of-sample RMSE. 
+Script computes forecasts with and without access to microdata.
 
 Copyright A. Michael Sharifi 2016
 
 Dependencies:
-fetch_data.m: script which loads housing data from FRED;
-results are stored as fetch_data_save.m
+fetch_data.m: script loads housing data from FRED; stores results as fetch_data_save.m
 %}
 
 clear all;

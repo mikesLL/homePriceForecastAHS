@@ -1,32 +1,30 @@
 %{
 gen_micro.m
-1. newhouse_flat is a flat file which contains AHS public-use microdata for
-1988-2014
-2. gen_micro.m constructs microdata-based variables of interest using newhouse_flat
+newhouse_flat contains  microdata-based variables from AHS data
 
 Copyright A. Michael Sharifi, 2016
 
 %}
 
 
-function [ ds_use ] = gen_micro( param, dsreadin_codes, ds_use, newhouse_flat )
+function [ ds_pool ] = gen_micro( param, dsreadin_codes, ds_pool, newhouse_flat )
 
 addpath('results');
-save('results/gen_micro_save');
+save('results/save_gen_micro');
 
 param.LTI = .4;
 param.max_mult = 40;
 param.min_mult = 10;
 param.Y_CC = 50000;
 
-ds_use.md1 = zeros(length(ds_use),1);  % md1: potential homebuyers
-ds_use.md2 = zeros(length(ds_use),1);  % md2: negative equity
-ds_use.md3 = zeros(length(ds_use),1);  % md3: paid-off homes
-ds_use.md4 = zeros(length(ds_use),1);  % md4: single-family rentals
+ds_pool.md1 = zeros(length(ds_pool),1);  % md1: potential homebuyers
+ds_pool.md2 = zeros(length(ds_pool),1);  % md2: negative equity
+ds_pool.md3 = zeros(length(ds_pool),1);  % md3: paid-off homes
+ds_pool.md4 = zeros(length(ds_pool),1);  % md4: single-family rentals
 
-ds_use.md5 = zeros(length(ds_use),1);  % md5: negative equity, cash-flow positive
-ds_use.md6 = zeros(length(ds_use),1);  % md6: negative equity, cash-flow negative
-ds_use.md7 = zeros(length(ds_use),1);  % md7: median pmt to income: new originations
+ds_pool.md5 = zeros(length(ds_pool),1);  % md5: negative equity, cash-flow positive
+ds_pool.md6 = zeros(length(ds_pool),1);  % md6: negative equity, cash-flow negative
+ds_pool.md7 = zeros(length(ds_pool),1);  % md7: median pmt to income: new originations
 
 N_cities = max(dsreadin_codes.city_id);
 
@@ -34,20 +32,20 @@ for city_id = 1:N_cities
     city_str = dsreadin_codes.city_str(city_id);
     param.SMSA = dsreadin_codes.SMSA1(city_id);
    
-    i_beg = find( ds_use.city_id == city_id, 1, 'first');
-    i_end = find( ds_use.city_id == city_id, 1, 'last');
+    i_beg = find( ds_pool.city_id == city_id, 1, 'first');
+    i_end = find( ds_pool.city_id == city_id, 1, 'last');
     
     [md1, md2, md3, md4, md5, md6, md7 ] = ...
-        gen_micro_city(param, city_str, ds_use(i_beg: i_end,:), newhouse_flat);
+        gen_micro_city(param, city_str, ds_pool(i_beg: i_end,:), newhouse_flat);
    
-    ds_use.md1(i_beg:i_end) = md1;
-    ds_use.md2(i_beg:i_end) = md2;
-    ds_use.md3(i_beg:i_end) = md3;
-    ds_use.md4(i_beg:i_end) = md4;
+    ds_pool.md1(i_beg:i_end) = md1;
+    ds_pool.md2(i_beg:i_end) = md2;
+    ds_pool.md3(i_beg:i_end) = md3;
+    ds_pool.md4(i_beg:i_end) = md4;
     
-    ds_use.md5(i_beg:i_end) = md5;
-    ds_use.md6(i_beg:i_end) = md6;
-    ds_use.md7(i_beg:i_end) = md7;
+    ds_pool.md5(i_beg:i_end) = md5;
+    ds_pool.md6(i_beg:i_end) = md6;
+    ds_pool.md7(i_beg:i_end) = md7;
 end
 
 end

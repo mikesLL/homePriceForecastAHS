@@ -51,3 +51,6 @@ eval_perf/*.mat
 *.filters
 *.opendb
 *.suo
+
+results/
+utils/smsa_char.m
