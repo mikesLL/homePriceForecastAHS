@@ -6,7 +6,7 @@ Copyright A. Michael Sharifi, 2016
 variables:
 1. ds_use: dataset stores composite data across cities and times
 2. ds_use.ret_qli, i=0,...,7: i'th lagged quarterly hpa (return)
-3. ds_use.mdj, j=1,...,7: j'th microdata-based variable
+3. ds_use.mdj, j=1,...,7: j'th microdata-based variables
 
 %}
 %addpath('readin');   % contains readin codes

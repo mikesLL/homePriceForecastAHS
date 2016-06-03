@@ -2,40 +2,39 @@
 gen_fore.m
 input: city, dataset, flag, gamma
 output: forecast, forecast combo, RMSE, portfolio weights
+for each city, compute RMSE of each individual forecast and forecast combination
+
+city_id: city index
+ds_use: incoming dataset
+micro_flag: indicator whehter to use microdata
+
+y_city: home price appreciation associated with city
+y_1f: forecasts
+y_l1f_RMSE: RMSE
+y_lf_combo: combination forecasts
+y_1f_combo: RMSE
 %}
+function [ y_ds, y_res, coeff_ds ] = gen_fore(param, city_id, ds_use, micro_flag )
 
-% heart of the project
-% main input should be a particular city
-% main output should be AR RMSE, and RMSE of each predictor and combination
-% relative to the passed in RMSE
+addpath('diag');
+save('diag/gen_fore_save.mat');   % TODO: delete this when running model
 
-% city_id: city index
-% ds_use: incoming dataset
-% micro_flag: flag to use microdata
+N_naive = 2;  % number of naive predictors
+N_combo = 5;  % number of combination forecasts
 
-% y_city: home price appreciation associated with city
-% y_1f: forecasts
-% y_l1f_RMSE: RMSE
-% y_lf_combo: combination forecasts
-% y_1f_combo: RMSE
+idx_use = all([ ds_use.YEAR >= param.year_beg, ds_use.YEAR <= param.year_end, ...
+    ds_use.city_id == city_id  ], 2);
 
-function [ y_ds, y_res, coeff_ds ] = gen_fore( city_id, ds_use, micro_flag )
-
-%addpath('results');
-save('gen_fore_save.mat');   % TODO: delete this when running model
-
-%% micro_flag = flag;
-idx_use = all([ ds_use.YEAR >= 1988, ds_use.YEAR <= 2012, ds_use.city_id == city_id  ], 2);
-
-%X_city_fund =  [ ds_use.RET(idx_use) ds_use.RP(idx_use) ds_use.PI_ratio(idx_use)];
-
+% fundamental predictors
 X_city_fund =  [ ds_use.ret_ql0(idx_use) ds_use.RP(idx_use) ds_use.PI_ratio(idx_use)];
 
-X_city_micro =  [ ds_use.md1(idx_use), ds_use.md2(idx_use) ...                                 % proportion at-risk households
+% microdata-based predictors (see readme.txt for details)
+X_city_micro =  [ ds_use.md1(idx_use), ds_use.md2(idx_use) ...        
                   ds_use.md3(idx_use), ds_use.md4(idx_use) ...
                   ds_use.md5(idx_use), ds_use.md6(idx_use) ...
                   ds_use.md7(idx_use) ];
-            
+
+% other predictors
 X_city_other = [ ds_use.APR(idx_use) ds_use.POPCHG(idx_use) ds_use.PCICHG(idx_use) ...
     ds_use.NU2POP(idx_use) ds_use.EMPCHG(idx_use) ...
     ds_use.LFCHG(idx_use) ds_use.URATE(idx_use) ...
@@ -52,9 +51,8 @@ y_ds.RET_fut = ds_use.RET_fut(idx_use);
 
 y_city = ds_use.RET_fut(idx_use);
 
-N_pred = size(X_city,2);                               % number of predictors to use (including bench); bench will be index 1
-N_naive = 2;
-N_combo = 5;
+N_pred = size(X_city,2);       % number of predictors to use (including benchmarks); bench will be index 1
+
 
 y_ds.fore = zeros(length(y_ds), N_pred);
 y_ds.fore_naive = zeros(length(y_ds), N_naive );

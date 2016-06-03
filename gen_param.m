@@ -10,7 +10,7 @@ param.LTI = .35;        % impose maximum mortgage payment to income
 param.Y_CC = 50000;
 
 param.year_beg = 1988;
-param.year_end = 2014;
+param.year_end = 2012;  % also can set = 2014
 param.year_end_pool = 2005;
 
 param.tau = 0.06; % represents transactions costs
