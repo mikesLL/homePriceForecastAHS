@@ -53,7 +53,6 @@ y_city = ds_use.RET_fut(idx_use);
 
 N_pred = size(X_city,2);       % number of predictors to use (including benchmarks); bench will be index 1
 
-
 y_ds.fore = zeros(length(y_ds), N_pred);
 y_ds.fore_naive = zeros(length(y_ds), N_naive );
 y_ds.fore_combo = zeros(length(y_ds), N_combo );
@@ -63,6 +62,7 @@ y_ds.fore_naive_RMSE = zeros(length(y_ds), N_naive );
 y_ds.fore_combo_RMSE = zeros(length(y_ds), N_combo );
 
 y_ds.valid = zeros(length(y_ds),1);
+
 %% construct estimation period
 err2_cum = zeros(N_pred, 1);
 
@@ -85,9 +85,9 @@ for t_use = t_begin:t_end
         pred = unique([1 i]);
         
         stats_i = regstats(y_city(1:t_est),X_city(1:t_est,pred),'linear');  
-        
-        stats_i_midas = reg_midas( y_city(1:t_est), X_city_fund(1:t_est,1), X_city(1:t_est,i) );
-        %stats_i_midas = reg_midas( y_city(1:t_est), X_city(1:t_est,i) );
+        [stats_i_midas, lags1_opt, lags2_opt] = reg_midas( y_city(1:t_est), X_city_fund(1:t_est,1), X_city(1:t_est,i) );
+       
+        % goal: given the above info, generate forecast
           
         coeff_ds.rho(t_est,i) = stats_i.beta(2);
         

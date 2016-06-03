@@ -9,8 +9,11 @@ theta_a12 = theta(5);
 theta_a21 = theta(6);
 theta_a22 = theta(7);
 
-l1 = lags1 + 1; % size(X1_use,2);  % calc lags in each X
-l2 = lags2 + 1; % size(X2_use,2);
+l1 = lags1; % size(X1_use,2);  % calc lags in each X
+l2 = lags2; % size(X2_use,2);
+
+%l1 = lags1 + 1; % size(X1_use,2);  % calc lags in each X
+%l2 = lags2 + 1; % size(X2_use,2);
 
 a1 = exp( theta_a11*(1:l1) + theta_a12*( (1:l1).^2 ) );
 w1 = a1 ./ sum(a1);
@@ -27,23 +30,3 @@ rss = sum( (y_use - y_hat).^2 );   % residual sum squares
 
 end
 
-%%
-%{
-coeff_alpha = theta1(1);  % retrieve parameters
-coeff_rho = theta1(2);
-coeff_beta = theta1(3);
-
-theta_a11 = theta1(4);
-theta_a12 = theta1(5);
-theta_a21 = theta1(6);
-theta_a22 = theta1(7);
-
-l1 = lags1 + 1; % size(X1_use,2);  % calc lags in each X
-l2 = lags2 + 1; % size(X2_use,2);
-
-a1 = exp( theta_a11*(1:l1) + theta_a12*( (1:l1).^2 ) );
-w1 = a1 ./ sum(a1);
-
-a2 = exp( theta_a21*(1:l2) + theta_a22*( (1:l2).^2 ) );
-w2 = a2 ./ sum(a2);
-%}
