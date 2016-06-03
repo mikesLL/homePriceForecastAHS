@@ -5,7 +5,7 @@ function [ theta, lags1, lags2 ] = reg_midas( y, X1, X2 )
 % X2: predictor variable ( quarters )
 % note that theta always takes on 7 parameters
 
-save('reg_midas_save');
+%save('reg_midas_save');
 
 options = optimset('MaxFunEvals', 10000);
 coeff_alpha = 0.0;     % trad'l parameters
