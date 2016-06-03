@@ -1,4 +1,13 @@
-function [ rss ] = f_almon( theta, y_use, X1_use, X2_use, lags1, lags2 )
+%{
+f_almon.m
+inputs: 
+theta: MIDAS regression parameters
+y_use: 
+%}
+
+function [ rss, y_hat ] = f_almon( theta, y_use, X1_use, X2_use, lags1, lags2 )
+%function [ y_hat ] = f_almon( theta, y_use, X1_use, X2_use, lags1, lags2 )
+
 
 coeff_alpha = theta(1);  % retrieve parameters
 coeff_rho = theta(2);

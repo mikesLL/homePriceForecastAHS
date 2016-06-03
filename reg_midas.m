@@ -11,8 +11,9 @@ note that theta always takes on 7 parameters
 %}
 
 function [ theta, lags1_opt, lags2_opt ] = reg_midas( y, X1, X2 )
-addpath('diag');
-save('diag/reg_midas_save');
+
+%addpath('diag');
+%save('diag/reg_midas_save');
 
 options = optimset('MaxFunEvals', 10000);
 coeff_alpha = 0.0;     % trad'l parameters
