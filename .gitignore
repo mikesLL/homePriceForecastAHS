@@ -54,3 +54,5 @@ eval_perf/*.mat
 
 results/
 utils/smsa_char.m
+*.asv
+diag/
