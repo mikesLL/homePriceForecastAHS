@@ -15,7 +15,10 @@ function [ theta, lags1_opt, lags2_opt ] = reg_midas( y, X1, X2 )
 %addpath('diag');
 %save('diag/reg_midas_save');
 
-options = optimset('MaxFunEvals', 10000);
+%options = optimset('MaxFunEvals', 100000);
+%options = optimset('MaxFunEvals', 100000, 'Display', 'off', 'Algorithm', 'lm-line-search');
+options = optimset('MaxFunEvals', 100000, 'Display', 'off');
+
 coeff_alpha = 0.0;     % trad'l parameters
 coeff_rho = 0.0;
 coeff_beta = 0.0;
@@ -49,6 +52,8 @@ for lags1 = 1:8
         % numerically solve for theta
         [theta, rss] = ...
             fminsearch( @(theta) f_almon(theta, y_use, X1_use, X2_use, lags1, lags2 ), theta0, options );
+        %[theta, rss] = ...
+        %    fminunc( @(theta) f_almon(theta, y_use, X1_use, X2_use, lags1, lags2 ), theta0, options );
         
         % calc bayesian information criterion
         n = length(y_use);
@@ -64,8 +69,9 @@ for lags1 = 1:8
     end
 end
 
-disp( [lags1_opt, lags2_opt] );
-disp( bic_min );
+%disp( [lags1_opt, lags2_opt] );
+%disp( bic_min );
+
 end
 
 %disp( [lags1_opt, lags2_opt] );

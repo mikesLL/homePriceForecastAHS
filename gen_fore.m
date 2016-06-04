@@ -79,41 +79,41 @@ coeff_ds.beta = zeros(length(y_city),N_pred);
 
 %%
 for t_use = t_begin:t_end
+    tic;
+    %t_use = 80;
     disp(t_use);
     t_est = t_use - h_step;  % 1-step forecast: information set
     
     for i=1:N_pred  % generate the simple predictors
-        pred = unique([1 i]);
-        
-        stats_i = regstats(y_city(1:t_est),X_city(1:t_est,pred),'linear');  
-        [stats_i_midas, lags1, lags2] = reg_midas( y_city(1:t_est), X_city_fund(1:t_est,1), X_city(1:t_est,i) );
-       
-        % goal: given the above info, generate forecast
-        % first, generate maxtrix with lags
-        X1_use = lagmatrix( X_city_fund(1:t_use,1), (0:(lags1-1) ) );
-        X2_use = lagmatrix( X_city(1:t_use,i), (0:(lags2-1) ) );
-        
-        % second, keep only t_use entry for forecast
-        X1_use = X1_use(t_use,:);
-        X2_use = X2_use(t_use,:);
-        
-        % third, enter into almon to generate forecast
-        %[ rss ] = f_almon( theta, y_use, X1_use, X2_use, lags1, lags2 )
-        theta = stats_i_midas;
-        %[rss, foo] = f_almon( theta, [], X1_use, X2_use, lags1, lags2 );
-        
-        coeff_ds.rho(t_est,i) = stats_i.beta(2);
-        
-        if i>=2
-            coeff_ds.beta(t_est,i) = stats_i.beta(3);
-        end
-        
+        disp(i);
+    
         midas_flag = 1;
         if midas_flag
+            [stats_i_midas, lags1, lags2] = ...
+                reg_midas( y_city(1:t_est), X_city_fund(1:t_est,1), X_city(1:t_est,i) );
+            
+            % first, generate maxtrix with lags
+            X1_use = lagmatrix( X_city_fund(1:t_use,1), (0:(lags1-1) ) );
+            X2_use = lagmatrix( X_city(1:t_use,i), (0:(lags2-1) ) );
+            
+            % second, keep only t_use entry for forecast
+            X1_use = X1_use(t_use,:);
+            X2_use = X2_use(t_use,:);
+            
+            % third, enter into almon to generate forecast
+            theta = stats_i_midas;
+             
             [rss, foo] = f_almon( theta, [], X1_use, X2_use, lags1, lags2 );
             y_ds.fore(t_use,i) = foo;
             
         else
+            pred = unique([1 i]);
+            stats_i = regstats(y_city(1:t_est),X_city(1:t_est,pred),'linear');
+            coeff_ds.rho(t_est,i) = stats_i.beta(2);
+            
+            if i>=2
+                coeff_ds.beta(t_est,i) = stats_i.beta(3);
+            end
             y_ds.fore(t_use,i) = [1.0 X_city(t_use,pred)] * stats_i.beta;
         end
     end
@@ -156,6 +156,7 @@ for t_use = t_begin:t_end
             y_ds.fore_combo_RMSE(t_use,i) = rmse( y_city(t_begin + h_step:t_use), y_ds.fore_combo(t_begin + h_step:t_use,i) );
         end
     end
+    toc;
 end
 
 %%
@@ -164,17 +165,4 @@ y_res =  [ y_ds.fore_RMSE(t_end,:) y_ds.fore_naive_RMSE(t_end,:) y_ds.fore_combo
 end
 
 
-function r=rmse(data,estimate)
-% Function to calculate root mean square error from a data vector or matrix 
-% and the corresponding estimates.
-% Usage: r=rmse(data,estimate)
-% Note: data and estimates have to be of same size
-% Example: r=rmse(randn(100,100),randn(100,100));
 
-% delete records with NaNs in both datasets first
-I = ~isnan(data) & ~isnan(estimate); 
-data = data(I); estimate = estimate(I);
-
-r=sqrt(sum((data(:)-estimate(:)).^2)/numel(data));
-
-end

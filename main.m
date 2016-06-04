@@ -30,7 +30,8 @@ y_ds_store{N_cities} = dataset;                               % forecasts
 y_ds_md_store{N_cities} = dataset;                            % forecasts w/micro data
 
 %%
-for city_id = 1:N_cities
+%for city_id = 1:N_cities
+for city_id = 2:2 % for now, los angeles only
     city_str = char( dsreadin_codes.city_str(city_id) );
     fprintf( 'city_id = %d,  city_str = %s \n', city_id, city_str ); 
    

@@ -6,8 +6,6 @@ y_use:
 %}
 
 function [ rss, y_hat ] = f_almon( theta, y_use, X1_use, X2_use, lags1, lags2 )
-%function [ y_hat ] = f_almon( theta, y_use, X1_use, X2_use, lags1, lags2 )
-
 
 coeff_alpha = theta(1);  % retrieve parameters
 coeff_rho = theta(2);
@@ -20,9 +18,6 @@ theta_a22 = theta(7);
 
 l1 = lags1; % size(X1_use,2);  % calc lags in each X
 l2 = lags2; % size(X2_use,2);
-
-%l1 = lags1 + 1; % size(X1_use,2);  % calc lags in each X
-%l2 = lags2 + 1; % size(X2_use,2);
 
 a1 = exp( theta_a11*(1:l1) + theta_a12*( (1:l1).^2 ) );
 w1 = a1 ./ sum(a1);
@@ -38,4 +33,7 @@ y_hat = coeff_alpha + coeff_rho*A + coeff_beta*B;
 rss = sum( (y_use - y_hat).^2 );   % residual sum squares
 
 end
+
+%l1 = lags1 + 1; % size(X1_use,2);  % calc lags in each X
+%l2 = lags2 + 1; % size(X2_use,2);
 
