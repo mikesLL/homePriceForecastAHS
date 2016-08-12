@@ -1,8 +1,6 @@
 %{
 smsa characeristics
-
-
-% file used for project_CSFv2
+utility files used for project_CSFv2
 %}
 
 addpath('../results');

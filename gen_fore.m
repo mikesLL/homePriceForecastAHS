@@ -53,23 +53,21 @@ y_city = ds_use.RET_fut(idx_use);
 
 N_pred = size(X_city,2);       % number of predictors to use (including benchmarks); bench will be index 1
 
-y_ds.fore = zeros(length(y_ds), N_pred);
-y_ds.fore_naive = zeros(length(y_ds), N_naive );
-y_ds.fore_combo = zeros(length(y_ds), N_combo );
+y_ds.fore = zeros(length(y_ds), N_pred);                   % individual forecasts
+y_ds.fore_naive = zeros(length(y_ds), N_naive );           % naive forecasts
+y_ds.fore_combo = zeros(length(y_ds), N_combo );           % forecast combinations
 
-y_ds.fore_RMSE = zeros(length(y_ds), N_pred);
-y_ds.fore_naive_RMSE = zeros(length(y_ds), N_naive );
-y_ds.fore_combo_RMSE = zeros(length(y_ds), N_combo );
+y_ds.fore_RMSE = zeros(length(y_ds), N_pred);              % individual forecast RMSE
+y_ds.fore_naive_RMSE = zeros(length(y_ds), N_naive );      % naive forecast RMSE
+y_ds.fore_combo_RMSE = zeros(length(y_ds), N_combo );      % forecast combination RMSE
 
-y_ds.valid = zeros(length(y_ds),1);
+y_ds.valid = zeros(length(y_ds),1);                        % validity indicator
 
 %% construct estimation period
 err2_cum = zeros(N_pred, 1);
-
-%%
 h_step = 4; % h-step: 4 quarters
 h_hold = 4; % holdout period
-t_begin = 60; % begin halfway into dataset
+t_begin = 60; % begin halfway into dataset 
 t_end = length(y_city)- h_step;
 
 %% ceofficient dataset
@@ -92,20 +90,16 @@ for t_use = t_begin:t_end
             [stats_i_midas, lags1, lags2] = ...
                 reg_midas( y_city(1:t_est), X_city_fund(1:t_est,1), X_city(1:t_est,i) );
             
-            % first, generate maxtrix with lags
+            % generate maxtrix with lags
             X1_use = lagmatrix( X_city_fund(1:t_use,1), (0:(lags1-1) ) );
             X2_use = lagmatrix( X_city(1:t_use,i), (0:(lags2-1) ) );
             
-            % second, keep only t_use entry for forecast
+            % keep only t_use entry for forecast
             X1_use = X1_use(t_use,:);
             X2_use = X2_use(t_use,:);
             
-            % third, enter into almon to generate forecast
-            theta = stats_i_midas;
-             
-            [rss, foo] = f_almon( theta, [], X1_use, X2_use, lags1, lags2 );
-            y_ds.fore(t_use,i) = foo;
-            
+            % enter into almon to generate forecast
+            [~, y_ds.fore(t_use,i)] = f_almon( stats_i_midas, [], X1_use, X2_use, lags1, lags2 );
         else
             pred = unique([1 i]);
             stats_i = regstats(y_city(1:t_est),X_city(1:t_est,pred),'linear');
@@ -118,6 +112,7 @@ for t_use = t_begin:t_end
         end
     end
     
+    % compute naive and combination forecasts
     y_ds.fore_naive(t_use,1) = mean(X_city(1:t_use, 1 ) );           % naive: historical mean
     y_ds.fore_naive(t_use,2) = X_city(t_use, 1 );                    % naive: lagged return
     
@@ -129,7 +124,7 @@ for t_use = t_begin:t_end
     
     weights2 = zeros(N_pred,1);
     
-    if t_use >= (t_begin + h_hold)   %t_use >= (t_begin + h_step)
+    if t_use >= (t_begin + h_hold)  
         y_ds.valid(t_use) = 1;
         for i=1:N_pred
             err2_cum(i) = sum( (y_city(t_begin:t_est) - y_ds.fore(t_begin:t_est,i)).^2 );
